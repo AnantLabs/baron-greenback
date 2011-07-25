@@ -2,8 +2,7 @@ package com.googlecode.barongreenback;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -22,6 +21,7 @@ import java.util.Map;
 
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
+import static com.googlecode.totallylazy.Callables.first;
 
 
 @Path("search")
@@ -44,19 +44,11 @@ public class SearchResource {
                 add("results", results.map(asMap()).toList());
     }
 
-    public static Callable1<? super Record, Map> asMap() {
-        return new Callable1<Record, Map>() {
-            public Map call(Record record) throws Exception {
-                return record.fields().fold(new HashMap(), intoMap());
-            }
-        };
-    }
-
-    public static Callable2<? super Map, ? super Pair<Keyword, Object>, Map> intoMap() {
-        return new Callable2<Map, Pair<Keyword, Object>, Map>() {
-            public Map call(Map map, Pair<Keyword, Object> pair) throws Exception {
-                map.put(pair.first().toString(), pair.second());
-                return map;
+    public static Callable1<? super Record, Map<String, Object>> asMap() {
+        return new Callable1<Record, Map<String, Object>>() {
+            public Map<String, Object> call(Record record) throws Exception {
+                return record.fields().map(first(asString(Keyword.class))).
+                        fold(new HashMap<String, Object>(), Maps.<String, Object>asMap());
             }
         };
     }
