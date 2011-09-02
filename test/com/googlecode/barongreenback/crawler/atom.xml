@@ -3,6 +3,7 @@
   <title>A title</title>
   <id>urn:uuid:d199d2c5-8975-f344-4bc8-a698158c6ef1</id>
   <updated>2011-07-19T12:43:26Z</updated>
+  <link rel="prev-archive" href="http://localhost:9001/data/prev" />
   <entry>
     <title>Added user</title>
     <link href="http://localhost:10010/static/entry1.xml" />

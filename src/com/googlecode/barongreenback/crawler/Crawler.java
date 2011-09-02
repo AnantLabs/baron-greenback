@@ -6,7 +6,6 @@ import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.URLs;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.xml.Xml;
@@ -28,6 +27,7 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
+import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 
@@ -52,17 +52,21 @@ public class Crawler {
         return Xml.document(xml);
     }
 
-    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String more) throws Exception {
+    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String moreSelector) throws Exception {
         Document document = document(url);
         Sequence<Record> recordsSoFar = crawl(document, recordDefinition);
-        if (!Strings.isEmpty(more)) {
-            String next = Xml.selectContents(document, more);
-            if (!Strings.isEmpty(next)) {
-                URL nextUrl = URLs.url(next);
-                return recordsSoFar.join(crawl(nextUrl, recordDefinition, more));
-            }
+        if (moreResults(moreSelector, document)) {
+            return recordsSoFar.join(crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector));
         }
         return recordsSoFar;
+    }
+
+    private String moreLink(String moreSelector, Document document) {
+        return selectContents(document, moreSelector);
+    }
+
+    private boolean moreResults(String more, Document document) {
+        return !Strings.isEmpty(more) && !Strings.isEmpty(moreLink(more, document));
     }
 
     public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition) throws Exception {

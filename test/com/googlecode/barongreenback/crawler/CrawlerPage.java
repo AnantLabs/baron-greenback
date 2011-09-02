@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.html.Checkbox;
 import com.googlecode.barongreenback.html.Html;
 import com.googlecode.barongreenback.html.Input;
 import com.googlecode.barongreenback.html.Select;
+import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -17,6 +18,7 @@ import static org.hamcrest.Matchers.containsString;
 public class CrawlerPage {
     public static final String UPDATE = "//input[@name='form.update']";
     public static final String FROM = "//input[@name='form.from']";
+    public static final String MORE = "//input[@name='form.more']";
     public static final String RECORD_NAME = "//input[@id='form.record.name']";
     public static final String KEYWORD_NAME = "//input[@id='form.record.keywords[%s].name']";
     public static final String ALIAS = "//input[@id='form.record.keywords[%s].alias']";
@@ -44,12 +46,22 @@ public class CrawlerPage {
         return new CrawlerListPage(httpHandler, response);
     }
 
+    public ViewSearchPage crawl() throws Exception {
+        Request request = html.form("//form[contains(@class, 'crawl')]").submit("//input[@type='submit' and @class='crawl']");
+        Response response = httpHandler.handle(request);
+        return new ViewSearchPage(httpHandler, response);
+    }
+
     public Input update() {
         return html.input(UPDATE);
     }
 
     public Input from() {
         return html.input(FROM);
+    }
+
+    public Input more() {
+        return html.input(MORE);
     }
 
     public Input recordName() {
