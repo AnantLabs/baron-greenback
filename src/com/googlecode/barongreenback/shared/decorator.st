@@ -3,9 +3,7 @@
 <head>
     <title>$title$ - Baron Greenback</title>
     <link rel="shortcut icon" href="$base$baron-greenback/shared/favicon.ico" />
-    <link rel="stylesheet/less" type="text/css" href="$base$baron-greenback/shared/style.less"/>
-    <script type="text/javascript">var less = less || {env : 'production'};</script>
-    <script src="$base$baron-greenback/shared/less-1.1.4.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="$base$baron-greenback/shared/style.less"/>
     $head$
 </head>
 <body class="$body.class$">

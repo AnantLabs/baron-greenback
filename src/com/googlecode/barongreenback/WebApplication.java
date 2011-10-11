@@ -2,6 +2,7 @@ package com.googlecode.barongreenback;
 
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.jobs.JobsModule;
+import com.googlecode.barongreenback.less.LessCssModule;
 import com.googlecode.barongreenback.lucene.LuceneModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
@@ -32,6 +33,7 @@ public class WebApplication extends RestApplication {
     }
 
     public static void addModules(Application application) {
+        application.add(new LessCssModule());
         application.add(new PerformanceModule());
         application.add(new LuceneModule());
         application.add(new SharedModule());

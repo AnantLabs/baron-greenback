@@ -10,3 +10,5 @@ mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:510
 mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:414
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:129
 mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:44
+
+mvn:rhino:js:jar:1.6R7
