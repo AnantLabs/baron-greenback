@@ -11,11 +11,15 @@ import java.util.concurrent.Callable;
 import static com.googlecode.totallylazy.Files.TEMP_DIR;
 
 public class DirectoryActivator implements Callable<Directory>, Closeable{
-    public static final File DEFAULT_DIRECTORY = new File(TEMP_DIR, "baron-greenback");
     private Directory directory;
+    private final LuceneIndexDirectory luceneIndexDirectory;
+
+    public DirectoryActivator(LuceneIndexDirectory luceneIndexDirectory) {
+        this.luceneIndexDirectory = luceneIndexDirectory;
+    }
 
     public Directory call() throws Exception {
-        directory = new NIOFSDirectory(DEFAULT_DIRECTORY);
+        directory = new NIOFSDirectory(luceneIndexDirectory.value());
         return directory;
     }
 

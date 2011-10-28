@@ -11,6 +11,6 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 public class WebApplicationTest {
     public static void main(String[] args) throws Exception {
         new RestServer(new Restaurant(), ServerConfiguration.defaultConfiguration().port(8899));
-        new RestServer(new WebApplication(), defaultConfiguration().port(9000));
+        new RestServer(new WebApplication(System.getProperties()), defaultConfiguration().port(9000));
     }
 }

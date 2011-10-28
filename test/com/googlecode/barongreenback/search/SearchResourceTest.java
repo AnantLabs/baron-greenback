@@ -70,6 +70,6 @@ public class SearchResourceTest extends ApplicationTests {
     }
 
     public static void main(String[] args) throws Exception {
-        new RestServer(addSomeData(new WebApplication()), defaultConfiguration().port(9000));
+        new RestServer(addSomeData(new WebApplication(System.getProperties())), defaultConfiguration().port(9000));
     }
 }

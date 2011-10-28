@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.jobs.JobsModule;
 import com.googlecode.barongreenback.less.LessCssModule;
+import com.googlecode.barongreenback.lucene.LuceneIndexDirectory;
 import com.googlecode.barongreenback.lucene.LuceneModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
@@ -10,7 +11,11 @@ import com.googlecode.barongreenback.views.ViewsModule;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.httpserver.RestServer;
+import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
+
+import java.io.File;
+import java.util.Properties;
 
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
@@ -25,7 +30,8 @@ import static com.googlecode.utterlyidle.sitemesh.StringTemplateDecorators.strin
 import static com.googlecode.utterlyidle.sitemesh.TemplateName.templateName;
 
 public class WebApplication extends RestApplication {
-    public WebApplication() {
+    public WebApplication(Properties properties) {
+        add(Modules.applicationInstance(properties));
         addModules(this);
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
@@ -45,6 +51,6 @@ public class WebApplication extends RestApplication {
     }
 
     public static void main(String[] args) throws Exception {
-        new RestServer(new WebApplication(), defaultConfiguration().port(9000));
+        new RestServer(new WebApplication(System.getProperties()), defaultConfiguration().port(9000));
     }
 }
