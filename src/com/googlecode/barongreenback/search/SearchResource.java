@@ -60,7 +60,7 @@ public class SearchResource {
         Option<Model> optionalView = view(viewName);
         Sequence<Keyword> allHeaders = headers(optionalView);
         Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Sequence<Record> results = records.query(parse(prefix(optionalView, query), visibleHeaders), allHeaders);
+        Sequence<Record> results = optionalView.isEmpty() ? Sequences.<Record>empty() : records.query(parse(prefix(optionalView, query), visibleHeaders), allHeaders);
         return model().
                 add("view", viewName).
                 add("query", query).
