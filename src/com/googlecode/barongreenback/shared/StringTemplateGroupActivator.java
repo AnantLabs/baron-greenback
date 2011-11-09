@@ -41,9 +41,7 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
         shared.registerRenderer(always(), Xml.escape());
-        EnhancedStringTemplateGroup group = new EnhancedStringTemplateGroup(baseUrl);
-        group.setSuperGroup(shared);
-        return group;
+        return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 
     private URL append(URL url, String path) {

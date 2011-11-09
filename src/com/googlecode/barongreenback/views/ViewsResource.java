@@ -97,6 +97,15 @@ public class ViewsResource {
         return redirectToList();
     }
 
+    @POST
+    @Path("copy")
+    public Response copy(@FormParam("id") UUID id) {
+        Option<Model> modelOption = modelRepository.get(id);
+        Model modelCopy = Views.copy(modelOption.get());
+        modelRepository.set(UUID.randomUUID(), modelCopy);
+        return redirectToList();
+    }
+
     @GET
     @Path("export")
     @Produces("application/json")

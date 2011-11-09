@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.funclate.Models;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
@@ -64,6 +65,16 @@ public class Views {
         return modelRepository.find(Predicates.where(MODEL_TYPE, is(ROOT))).
                 find(where(valueFor("name", String.class), is(name))).
                 map(Callables.<Model>second());
+    }
+
+    public static Model copy(Model model) {
+        Model copy = model.copy();
+        Model root = copy.get(ROOT);
+        String oldName = root.remove("name", String.class);
+        root.add("name", "copy of " + oldName);
+        root.remove("visible", Boolean.class);
+        root.add("visible", false);
+        return copy;
     }
 
     public static Callable1<? super Model, Model> unwrap() {
