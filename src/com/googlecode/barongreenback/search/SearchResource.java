@@ -140,7 +140,7 @@ public class SearchResource {
                 Keyword keyword = pair.first();
                 Object value = pair.second();
                 String key = keyword.metadata().get(lookupKeyword);
-                if (key.isEmpty()) key = "Other";
+                if (Strings.isEmpty(key)) key = "Other";
                 if (!map.containsKey(key)) {
                     map.put(key, new LinkedHashMap<String, Object>());
                 }
