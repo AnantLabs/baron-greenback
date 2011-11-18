@@ -12,6 +12,6 @@ $if(results)$
         }$
         </tbody>
     </table>
-    $pager$
 </div>
+$pager$
 $endif$
