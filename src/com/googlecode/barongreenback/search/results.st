@@ -12,5 +12,6 @@ $if(!results.empty)$
         }$
         </tbody>
     </table>
+    $pager$
 </div>
 $endif$

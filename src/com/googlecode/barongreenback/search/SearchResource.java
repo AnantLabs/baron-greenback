@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.lucene.QueryParserActivator;
+import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
@@ -59,13 +60,15 @@ public class SearchResource {
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final AdvancedMode mode;
+    private final Pager pager;
 
-    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode) {
+    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final Pager pager) {
         this.records = records;
         this.parser = parser;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.mode = mode;
+        this.pager = pager;
     }
 
     @POST
@@ -94,7 +97,8 @@ public class SearchResource {
                 add("view", viewName).
                 add("query", query).
                 add("headers", headers(visibleHeaders, results)).
-                add("results", results.map(asModel(viewName, visibleHeaders)).toList());
+                add("pager", pager).
+                add("results", pager.paginate(results).map(asModel(viewName, visibleHeaders)).toList());
     }
 
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
