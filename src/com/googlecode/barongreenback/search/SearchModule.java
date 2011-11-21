@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.search.pager.Pager;
+import com.googlecode.barongreenback.search.pager.RequestPager;
 import com.googlecode.barongreenback.search.parser.ParametrizedParser;
 import com.googlecode.barongreenback.search.parser.ParserParameters;
 import com.googlecode.barongreenback.search.parser.PredicateParser;
@@ -19,7 +20,7 @@ public class SearchModule implements ResourcesModule, RequestScopedModule, Modul
     }
 
     public Module addPerRequestObjects(Container container) throws Exception {
-		container.add(Pager.class);
+		container.add(Pager.class, RequestPager.class);
         container.add(PredicateParser.class, StandardParser.class);
         container.decorate(PredicateParser.class, ParametrizedParser.class);
         container.add(ParserParameters.class);

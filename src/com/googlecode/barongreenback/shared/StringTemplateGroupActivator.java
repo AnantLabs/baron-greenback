@@ -2,8 +2,8 @@ package com.googlecode.barongreenback.shared;
 
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.search.pager.PagerRenderer;
+import com.googlecode.barongreenback.search.pager.RequestPager;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
 import com.googlecode.totallylazy.URLs;
 import com.googlecode.totallylazy.Xml;
@@ -37,7 +37,7 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer(always(), Xml.escape());
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
-        shared.registerRenderer(instanceOf(Pager.class), PagerRenderer.pagerRenderer());
+        shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer());
         return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 

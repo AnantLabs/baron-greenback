@@ -17,7 +17,7 @@ public class PagerTest {
     @Test
     public void defaultsTheCurrentPageAndRows() throws Exception {
         Request request = RequestBuilder.get("/somePath").build();
-        Pager pager = new Pager(request);
+        Pager pager = new RequestPager(request);
 
         assertThat(pager.getCurrentPage(), is(1));
         assertThat(pager.getRowsPerPage(), is(20));
@@ -26,7 +26,7 @@ public class PagerTest {
     @Test
     public void getsCurrentPageAndRowsPerPageFromRequest() throws Exception {
         Request request = requestForCurrentPageAndRows(30, 25).build();
-        Pager pager = new Pager(request);
+        Pager pager = new RequestPager(request);
         
         assertThat(pager.getCurrentPage(), is(30));
         assertThat(pager.getRowsPerPage(), is(25));
@@ -34,7 +34,7 @@ public class PagerTest {
 
     @Test
     public void paginateShouldReturnSequenceForNthPage() throws Exception {
-        Pager pager = new Pager(requestForCurrentPageAndRows(4, 20).build());
+        Pager pager = new RequestPager(requestForCurrentPageAndRows(4, 20).build());
         Sequence<Number> sequence = range(1, 101);
 
         Sequence<Number> paginatedSequence = pager.paginate(sequence);
@@ -44,7 +44,7 @@ public class PagerTest {
 
     @Test
     public void getQueryForPageNIgnoredOtherParametersAndSetsPage() throws Exception {
-        Pager pager = new Pager(requestForCurrentPageAndRows(5, 10).withQuery("dont", "touchme").build());
+        Pager pager = new RequestPager(requestForCurrentPageAndRows(5, 10).withQuery("dont", "touchme").build());
 
         QueryParameters parameters = QueryParameters.parse(removeLeadingQuestionMark(pager));
         assertThat(parameters.getValue(Pager.CURRENT_PAGE_PARAM), is("2"));
