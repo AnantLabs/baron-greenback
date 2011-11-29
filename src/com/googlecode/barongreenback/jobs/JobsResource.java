@@ -19,14 +19,10 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 import java.util.List;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.jobs.HttpScheduler.COMPLETED;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.DURATION;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.INTERVAL;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.JOB_ID;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.REQUEST;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.RESPONSE;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.RUNNING;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.STARTED;
+import static com.googlecode.barongreenback.jobs.HttpScheduler.*;
+import static com.googlecode.barongreenback.jobs.Job.INTERVAL;
+import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
+import static com.googlecode.barongreenback.jobs.Job.REQUEST;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -52,7 +48,7 @@ public class JobsResource {
     public Response schedule(@PathParam("id") UUID id, @PathParam("seconds") Long seconds, @PathParam("$") String endOfUrl) throws Exception {
         Request scheduledRequest = request.uri(request.uri().path(endOfUrl));
 
-        scheduler.schedule(record().set(INTERVAL, seconds).set(JOB_ID, id).set(REQUEST, scheduledRequest.toString()));
+        scheduler.schedule(Job.job(id).interval(seconds).request(scheduledRequest.toString()));
 
         return redirectToList();
     }
@@ -60,7 +56,7 @@ public class JobsResource {
     @POST
     @Path("reschedule")
     public Response reschedule(@FormParam("id") UUID id, @FormParam("seconds") Long seconds) throws Exception {
-        scheduler.schedule(record().set(INTERVAL, seconds).set(JOB_ID, id));
+        scheduler.schedule(Job.job(id).interval(seconds));
         return redirectToList();
     }
 

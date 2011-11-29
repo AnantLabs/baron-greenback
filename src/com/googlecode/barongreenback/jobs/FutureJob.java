@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.jobs;
 
 import java.util.concurrent.Future;
 
-public class FutureJob implements Job {
+public class FutureJob implements Cancellable {
     private final Future<?> future;
 
     public FutureJob(Future<?> future) {

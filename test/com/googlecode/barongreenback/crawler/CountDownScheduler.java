@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.Scheduler;
-import com.googlecode.barongreenback.jobs.Job;
+import com.googlecode.barongreenback.jobs.Cancellable;
 import com.googlecode.totallylazy.Runnables;
 
 import java.util.UUID;
@@ -17,7 +17,7 @@ public class CountDownScheduler implements Scheduler {
         this.latch = latch;
     }
 
-    public Job schedule(UUID id, Callable<?> command, long numberOfSeconds) {
+    public Cancellable schedule(UUID id, Callable<?> command, long numberOfSeconds) {
         return scheduler.schedule(id, decorate(command), numberOfSeconds);
     }
 

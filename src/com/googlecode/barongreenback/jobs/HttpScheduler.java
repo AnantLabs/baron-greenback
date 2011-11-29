@@ -31,10 +31,7 @@ import static com.googlecode.utterlyidle.HttpMessageParser.parseRequest;
 public class HttpScheduler {
     public static final Keyword<String> JOBS = keyword("jobs", String.class);
 
-    public static final Keyword<UUID> JOB_ID = keyword("jobs_id", UUID.class);
-    public static final Keyword<String> REQUEST = keyword("request", String.class);
     public static final Keyword<String> RESPONSE = keyword("response", String.class);
-    public static final Keyword<Long> INTERVAL = keyword("interval", Long.class);
     public static final Keyword<Long> DURATION = keyword("duration", Long.class);
     public static final Keyword<Date> STARTED = keyword("started", Date.class);
     public static final Keyword<Date> COMPLETED = keyword("completed", Date.class);
@@ -54,15 +51,16 @@ public class HttpScheduler {
     }
 
     private static void define(Records records) {
-        records.define(JOBS, JOB_ID, REQUEST, RESPONSE, INTERVAL, DURATION, STARTED, COMPLETED, RUNNING);
+        records.define(JOBS, Job.JOB_ID, Job.REQUEST, RESPONSE, Job.INTERVAL, DURATION, STARTED, COMPLETED, RUNNING);
     }
 
-    public UUID schedule(Record possiblePartialRecord) {
-        records.put(JOBS, update(using(JOB_ID), possiblePartialRecord));
-        UUID id = possiblePartialRecord.get(JOB_ID);
+    public UUID schedule(Job job) {
+        Record possiblyPartialRecord = job.asRecord();
+        records.put(JOBS, update(using(Job.JOB_ID), possiblyPartialRecord));
+        UUID id = possiblyPartialRecord.get(Job.JOB_ID);
 
         Record fullRecord = job(id).get();
-        scheduler.schedule(id, httpTask(id, application, parseRequest(fullRecord.get(REQUEST))), fullRecord.get(INTERVAL));
+        scheduler.schedule(id, httpTask(id, application, parseRequest(fullRecord.get(Job.REQUEST))), fullRecord.get(Job.INTERVAL));
         return id;
     }
 
@@ -76,15 +74,15 @@ public class HttpScheduler {
 
     public void remove(UUID id) {
         scheduler.cancel(id);
-        records.remove(JOBS, where(JOB_ID, is(id)));
+        records.remove(JOBS, where(Job.JOB_ID, is(id)));
     }
 
     public Sequence<Record> jobs() {
-        return records.get(JOBS).realise().filter(where(REQUEST, not(empty()))).filter(new UniqueRecords(JOB_ID));
+        return records.get(JOBS).realise().filter(where(Job.REQUEST, not(empty()))).filter(new UniqueRecords(Job.JOB_ID));
     }
 
     public Option<Record> job(UUID id) {
-        return jobs().find(where(JOB_ID, is(id)));
+        return jobs().find(where(Job.JOB_ID, is(id)));
     }
 
     private Callable<Void> httpTask(final UUID id, final Application application, final Request request) {
@@ -92,7 +90,7 @@ public class HttpScheduler {
             public Void call() throws Exception {
                 final Date started = clock.now();
                 application.usingRequestScope(updateJob(record().
-                        set(JOB_ID, id).
+                        set(Job.JOB_ID, id).
                         set(RESPONSE, null).
                         set(STARTED, started).
                         set(COMPLETED, null).
@@ -100,7 +98,7 @@ public class HttpScheduler {
                 final Response response = application.handle(request);
                 Date completed = clock.now();
                 return application.usingRequestScope(updateJob(record().
-                        set(JOB_ID, id).
+                        set(Job.JOB_ID, id).
                         set(RESPONSE, response.toString()).
                         set(DURATION, calculateSeconds(started, completed)).
                         set(COMPLETED, completed).
@@ -114,7 +112,7 @@ public class HttpScheduler {
             public Void call(Container container) throws Exception {
                 Records newTransaction = container.get(Records.class);
                 define(newTransaction);
-                newTransaction.put(JOBS, update(using(JOB_ID), record));
+                newTransaction.put(JOBS, update(using(Job.JOB_ID), record));
                 return VOID;
             }
         };
@@ -127,7 +125,7 @@ public class HttpScheduler {
     private Callable1<Record, Void> cancel() {
         return new Callable1<Record, Void>() {
             public Void call(Record record) throws Exception {
-                scheduler.cancel(record.get(JOB_ID));
+                scheduler.cancel(record.get(Job.JOB_ID));
                 return VOID;
             }
         };
@@ -136,7 +134,7 @@ public class HttpScheduler {
     private Callable1<Record, Void> schedule() {
         return new Callable1<Record, Void>() {
             public Void call(Record record) throws Exception {
-                scheduler.schedule(record.get(JOB_ID), httpTask(record.get(JOB_ID), application, parseRequest(record.get(REQUEST))), record.get(INTERVAL));
+                scheduler.schedule(record.get(Job.JOB_ID), httpTask(record.get(Job.JOB_ID), application, parseRequest(record.get(Job.REQUEST))), record.get(Job.INTERVAL));
                 return VOID;
             }
         };

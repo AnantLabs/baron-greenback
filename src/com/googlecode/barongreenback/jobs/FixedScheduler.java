@@ -8,14 +8,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class FixedScheduler implements Scheduler {
-    private final Map<UUID, Job> jobs = new HashMap<UUID, Job>();
+    private final Map<UUID, Cancellable> jobs = new HashMap<UUID, Cancellable>();
     private final ScheduledExecutorService service;
 
     public FixedScheduler(ScheduledExecutorService service) {
         this.service = service;
     }
 
-    public Job schedule(UUID id, Callable<?> command, long numberOfSeconds) {
+    public Cancellable schedule(UUID id, Callable<?> command, long numberOfSeconds) {
         cancel(id);
         FutureJob job = new FutureJob(service.scheduleWithFixedDelay(asRunnable(command), 0, numberOfSeconds, TimeUnit.SECONDS));
         jobs.put(id, job);
@@ -35,7 +35,7 @@ public class FixedScheduler implements Scheduler {
     }
 
     public void cancel(UUID id) {
-        Job job = jobs.remove(id);
+        Cancellable job = jobs.remove(id);
         if (job != null) {
             job.cancel();
         }
