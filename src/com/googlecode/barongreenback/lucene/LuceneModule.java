@@ -28,7 +28,6 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
         container.addInstance(Mappings.class, new Mappings().add(Model.class, new ModelMapping()));
         container.addInstance(PrintStream.class, new StringPrintStream());
         container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
-        container.add(QueryParserActivator.class);
         return this;
     }
 }
