@@ -5,14 +5,7 @@ import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -79,10 +72,29 @@ public class SearchResource {
     }
 
     @GET
+    @Path("shortcut")
+    public Object shortcutList(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
+        final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
+
+        if (errorOrResults.isRight() && errorOrResults.right().size().intValue() == 1) {
+            final Sequence<Keyword> visibleHeaders = recordsService.visibleHeaders(viewName);
+            Option<Keyword> unique = visibleHeaders.find(new Predicate<Keyword>() {
+                @Override
+                public boolean matches(Keyword other) {
+                    return Boolean.TRUE.equals(other.metadata().get(Keywords.UNIQUE));
+                }
+            });
+            return Responses.seeOther(uniqueUrlOf(errorOrResults.right().head(), unique.get(), viewName));
+        }
+
+        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query));
+    }
+
+    @GET
     @Path("unique")
     public Object unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
         final Option<Record> record = recordsService.findUnique(viewName, query);
-        if(record.isEmpty()) return Responses.response(Status.NOT_FOUND);
+        if (record.isEmpty()) return Responses.response(Status.NOT_FOUND);
 
         Map<String, Map<String, Object>> group = record.get().fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return baseModel(viewName, query).add("record", group);

@@ -27,7 +27,7 @@ public class CrawlerTest extends CrawlerTests{
     public static final RecordDefinition ENTRY_DEFINITION = new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME));
 
     public static final Keyword<Object> ENTRIES = keyword("/feed/entry");
-    public static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
+    public static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, true).set(Views.VISIBLE, true));
     public static final Keyword<URI> LINK = keyword("link/@href", URI.class).
             metadata(record().set(Keywords.UNIQUE, true).set(RECORD_DEFINITION, ENTRY_DEFINITION));
     public static final Keyword<String> UPDATED = keyword("updated", String.class).metadata(record().set(Crawler.CHECKPOINT, true));
