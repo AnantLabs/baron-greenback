@@ -14,7 +14,6 @@ import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.annotations.AnnotatedBindings;
-import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Waitrest;
 import com.googlecode.yadic.Container;
 import org.hamcrest.Matchers;
@@ -29,19 +28,17 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
-import static com.googlecode.utterlyidle.RelativeUriExtractor.relativeUriOf;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 public class SearchResourceTest extends ApplicationTests {
-     @Test
+    @Test
     public void handlesInvalidQueriesInANiceWay() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "^&%$^%");
         assertThat(searchPage.queryMessage(), Matchers.is("Invalid Query"));
     }
 
-     @Test
+    @Test
     public void supportsDelete() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "", true);
         assertThat(searchPage.numberOfResults(), is(2));
@@ -68,12 +65,27 @@ public class SearchResourceTest extends ApplicationTests {
     }
 
     @Test
-    public void handleShortcutToUniqueIfOnlyOneResult() throws Exception {
-        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).shortcutList("users",  "id:\"urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1\""))));
+    public void supportsShortcutToUniquePage() throws Exception {
+        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).shortcut("users", "id:\"urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1\""))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
         assertThat(response.header("Location"), Matchers.is("/users/search/unique?query=id%3A%22urn%3Auuid%3Ac356d2c5-f975-4c4d-8e2a-a698158c6ef1%22"));
+    }
 
+    @Test
+    public void supportsShortcutToListPage() throws Exception {
+        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).shortcut("users", ""))));
+        Response response = application.handle(requestBuilder.build());
+        assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
+        assertThat(response.header("Location"), Matchers.is("/users/search/list?query="));
+    }
+
+    @Test
+    public void shortCut() throws Exception {
+        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).shortcut("users", "BAD_QUERY"))));
+        Response response = application.handle(requestBuilder.build());
+        assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
+        assertThat(response.header("Location"), Matchers.is("/users/search/list?query=BAD_QUERY"));
     }
 
     @Before

@@ -73,21 +73,24 @@ public class SearchResource {
 
     @GET
     @Path("shortcut")
-    public Object shortcutList(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
-        final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
-
-        if (errorOrResults.isRight() && errorOrResults.right().size().intValue() == 1) {
+    public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
+        if (recordsService.count(viewName, query) == 1) {
             final Sequence<Keyword> visibleHeaders = recordsService.visibleHeaders(viewName);
-            Option<Keyword> unique = visibleHeaders.find(new Predicate<Keyword>() {
-                @Override
-                public boolean matches(Keyword other) {
-                    return Boolean.TRUE.equals(other.metadata().get(Keywords.UNIQUE));
-                }
-            });
+            final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
+            Option<Keyword> unique = uniqueHeader(visibleHeaders);
             return Responses.seeOther(uniqueUrlOf(errorOrResults.right().head(), unique.get(), viewName));
+        } else {
+            return Responses.seeOther(redirector.uriOf(method(on(this.getClass()).list(viewName, query))));
         }
+    }
 
-        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query));
+    private Option<Keyword> uniqueHeader(Sequence<Keyword> visibleHeaders) {
+        return visibleHeaders.find(new Predicate<Keyword>() {
+            @Override
+            public boolean matches(Keyword other) {
+                return Boolean.TRUE.equals(other.metadata().get(Keywords.UNIQUE));
+            }
+        });
     }
 
     @GET
