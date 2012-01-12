@@ -2,10 +2,10 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.search.pager.RequestPager;
-import com.googlecode.barongreenback.search.parser.ParametrizedParser;
-import com.googlecode.barongreenback.search.parser.ParserParameters;
-import com.googlecode.barongreenback.search.parser.PredicateParser;
-import com.googlecode.barongreenback.search.parser.StandardParser;
+import com.googlecode.lazyrecords.parser.ParametrizedParser;
+import com.googlecode.lazyrecords.parser.ParserParameters;
+import com.googlecode.lazyrecords.parser.PredicateParser;
+import com.googlecode.lazyrecords.parser.StandardParser;
 import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.Module;

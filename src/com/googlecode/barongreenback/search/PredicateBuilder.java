@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.search.parser.PredicateParser;
+import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Predicate;
