@@ -8,11 +8,13 @@ import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 import com.googlecode.yadic.Container;
 
 import java.util.Date;
+import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -82,8 +84,8 @@ public class HttpScheduler {
                 } catch (Exception e) {
                     Date completed = clock.now();
                     return application.usingRequestScope(updateJob(
-                            Job.job(id).response(response(Status.INTERNAL_SERVER_ERROR).
-                                    bytes(ExceptionRenderer.toString(e).getBytes()).toString()).
+                            Job.job(id).response(ResponseBuilder.response(Status.INTERNAL_SERVER_ERROR).
+                                    entity(ExceptionRenderer.toString(e)).toString()).
                                     duration(calculateSeconds(started, completed)).
                                     completed(completed).running(false)));
                 }

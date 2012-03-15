@@ -12,6 +12,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.utterlyidle.HttpHeaders;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -29,7 +30,9 @@ import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.utterlyidle.HttpHeaders.*;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
+import static com.googlecode.utterlyidle.Response.methods.header;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SearchResourceTest extends ApplicationTests {
@@ -70,7 +73,7 @@ public class SearchResourceTest extends ApplicationTests {
         RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).shortcut("users", "id:\"urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1\""))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
-        assertThat(response.header("Location"), Matchers.is("/users/search/unique?query=id%3A%22urn%3Auuid%3Ac356d2c5-f975-4c4d-8e2a-a698158c6ef1%22"));
+        assertThat(header(response, LOCATION), Matchers.is("/users/search/unique?query=id%3A%22urn%3Auuid%3Ac356d2c5-f975-4c4d-8e2a-a698158c6ef1%22"));
     }
 
     @Test
@@ -78,7 +81,7 @@ public class SearchResourceTest extends ApplicationTests {
         RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).shortcut("users", ""))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
-        assertThat(response.header("Location"), Matchers.is("/users/search/list?query="));
+        assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query="));
     }
 
     @Test
@@ -86,7 +89,7 @@ public class SearchResourceTest extends ApplicationTests {
         RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).shortcut("users", "BAD_QUERY"))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
-        assertThat(response.header("Location"), Matchers.is("/users/search/list?query=BAD_QUERY"));
+        assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query=BAD_QUERY"));
     }
 
     @Before

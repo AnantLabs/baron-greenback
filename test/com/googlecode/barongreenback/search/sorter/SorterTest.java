@@ -25,10 +25,10 @@ public class SorterTest {
 
     @Test
     public void readsKeywordToSortFromRequest() throws Exception {
-        Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").withQuery(SORT_COLUMN_QUERY_PARAM, "mooCow").build());
+        Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "mooCow").build());
         assertThat(secondSorter.sort(records(), keywords()).map(asSecondKeyword()).safeCast(String.class), is(sequence("1", "2", "3")));
 
-        Sorter thirdSorter = new Sorter(RequestBuilder.get("/somePath").withQuery(SORT_COLUMN_QUERY_PARAM, "blueCow").build());
+        Sorter thirdSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "blueCow").build());
         assertThat(thirdSorter.sort(records(), keywords()).map(asThirdKeyword()).safeCast(Date.class), is(sequence(new Date(1), new Date(10000), new Date(100000))));
     }
 
@@ -40,7 +40,7 @@ public class SorterTest {
 
     @Test
     public void usesDescendingOrderWhenSpecified() throws Exception {
-        Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").withQuery(SORT_COLUMN_QUERY_PARAM, "mooCow").withQuery(SORT_DIRECTION_QUERY_PARAM, "desc").build());
+        Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "mooCow").query(SORT_DIRECTION_QUERY_PARAM, "desc").build());
         assertThat(secondSorter.sort(records(), keywords()).map(asSecondKeyword()).safeCast(String.class), is(sequence("3", "2", "1")));
     }
 

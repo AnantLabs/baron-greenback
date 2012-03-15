@@ -29,8 +29,7 @@ public class UriFeeder implements Feeder<Uri> {
             if (!response.status().equals(Status.OK)) {
                 return empty();
             }
-            Document document = document(new String(response.bytes()));
-            return feeder.get(document, definition);
+            return feeder.get(document(response.entity().toString()), definition);
         } catch (Exception e) {
             System.err.println(format("Failed to GET '%s' because of %s", uri, e));
             return empty();

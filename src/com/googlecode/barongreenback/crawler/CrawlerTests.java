@@ -32,11 +32,11 @@ public abstract class CrawlerTests {
         Waitrest waitrest = new Waitrest("/", 9001);
         ClientHttpHandler restClient = new ClientHttpHandler();
         final URL waitrestURL = waitrest.getURL();
-        restClient.handle(put(uri(waitrestURL, "data")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("atom.xml").getBytes()).build());
-        restClient.handle(put(uri(waitrestURL, "data/prev")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("atom-prev.xml").getBytes()).build());
-        restClient.handle(put(uri(waitrestURL, "entry1.xml")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("entry1.xml").getBytes()).build());
-        restClient.handle(put(uri(waitrestURL, "entry2.xml")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("entry2.xml").getBytes()).build());
-        restClient.handle(put(uri(waitrestURL, "invalid.xml")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("invalid.xml").getBytes()).build());
+        restClient.handle(put(uri(waitrestURL, "data")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("atom.xml")).build());
+        restClient.handle(put(uri(waitrestURL, "data/prev")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("atom-prev.xml")).build());
+        restClient.handle(put(uri(waitrestURL, "entry1.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("entry1.xml")).build());
+        restClient.handle(put(uri(waitrestURL, "entry2.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("entry2.xml")).build());
+        restClient.handle(put(uri(waitrestURL, "invalid.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("invalid.xml")).build());
         return waitrest;
     }
 
@@ -47,9 +47,4 @@ public abstract class CrawlerTests {
     public static String contentOf(String name) {
         return Strings.toString(CrawlerTests.class.getResourceAsStream(name));
     }
-
-
-
-
-
 }

@@ -7,6 +7,7 @@ import com.googlecode.utterlyidle.HttpHeaders;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
@@ -35,14 +36,13 @@ public class LessCssHandler implements HttpHandler {
         if (!(uri.path().endsWith(".less") && response.status().equals(Status.OK))) {
             return response;
         }
-        String less = new String(response.bytes());
-        return response.bytes(processLess(uri, less).getBytes("UTF-8"));
+        String less = response.entity().toString();
+        return ResponseBuilder.modify(response).entity(processLess(uri, less)).build();
     }
 
     private String processLess(Uri uri, String less) throws IOException {
-        if(cache.containsKey(uri) && config.useCache()){
-            String value = cache.get(uri);
-            return value;
+        if (cache.containsKey(uri) && config.useCache()) {
+            return cache.get(uri);
         }
         String result = lessCompiler.compile(less, new Loader(uri));
         cache.put(uri, result);
@@ -60,7 +60,7 @@ public class LessCssHandler implements HttpHandler {
             try {
                 uri = uri.mergePath(newUri);
                 Response response = httpHandler.handle(get(uri).header(HttpHeaders.ACCEPT, MediaType.TEXT_CSS).build());
-                return new String((byte[]) response.entity());
+                return response.entity().toString();
             } catch (Exception e) {
                 return ExceptionRenderer.toString(e);
             }

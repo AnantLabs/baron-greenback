@@ -119,7 +119,7 @@ public class JobsResource {
                 add("raw", requestMessage).
                 add("method", request.method()).
                 add("uri", request.uri()).
-                add("entity", new String(request.entity()));
+                add("entity", request.entity().toString());
     }
 
     public static Model addResponse(Record record) {
@@ -132,7 +132,7 @@ public class JobsResource {
                 add("raw", responseMessage).
                 add("code", response.status().code()).
                 add("status", response.status().description()).
-                add("entity", new String(response.bytes()));
+                add("entity", response.entity().toString());
     }
 
 

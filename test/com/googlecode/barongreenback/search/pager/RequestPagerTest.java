@@ -44,20 +44,20 @@ public class RequestPagerTest {
 
     @Test
     public void getQueryForPageNIgnoredOtherParametersAndSetsPage() throws Exception {
-        Pager pager = new RequestPager(requestForCurrentPageAndRows(5, 10).withQuery("dont", "touchme").build());
+        Pager pager = new RequestPager(requestForCurrentPageAndRows(5, 10).query("dont", "touchme").build());
 
         QueryParameters parameters = QueryParameters.parse(removeLeadingQuestionMark(pager));
         assertThat(parameters.getValue(Pager.CURRENT_PAGE_PARAM), is("2"));
         assertThat(parameters.getValue(Pager.ROWS_PER_PAGE_PARAM), is("10"));
         
         Parameters actualOtherParams = parameters.remove(Pager.CURRENT_PAGE_PARAM);
-        Parameters expectedOtherParams = QueryParameters.parse(requestForCurrentPageAndRows(5, 10).withQuery("dont", "touchme").build().uri().query()).remove(Pager.CURRENT_PAGE_PARAM);
+        Parameters expectedOtherParams = QueryParameters.parse(requestForCurrentPageAndRows(5, 10).query("dont", "touchme").build().uri().query()).remove(Pager.CURRENT_PAGE_PARAM);
         assertThat(actualOtherParams, is(expectedOtherParams));
     }
 
     @Test
     public void supportsAllParameter() throws Exception {
-        Pager pager = new RequestPager(RequestBuilder.get("/somePage").withQuery(Pager.ROWS_PER_PAGE_PARAM, "ALL").build());
+        Pager pager = new RequestPager(RequestBuilder.get("/somePage").query(Pager.ROWS_PER_PAGE_PARAM, "ALL").build());
         Sequence<Number> sequence = range(1, 100000).realise();
 
         Sequence<Number> paginatedSequence = pager.paginate(sequence);
@@ -68,7 +68,7 @@ public class RequestPagerTest {
 
     @Test
     public void ignoredPagesNumbersWhenShowingAllRecords() throws Exception {
-        Pager pager = new RequestPager(RequestBuilder.get("/somePage").withQuery(Pager.CURRENT_PAGE_PARAM, 25).withQuery(Pager.ROWS_PER_PAGE_PARAM, "100001").build());
+        Pager pager = new RequestPager(RequestBuilder.get("/somePage").query(Pager.CURRENT_PAGE_PARAM, 25).query(Pager.ROWS_PER_PAGE_PARAM, "100001").build());
         Sequence<Number> sequence = range(1, 100000).realise();
 
         Sequence<Number> paginatedSequence = pager.paginate(sequence);
@@ -82,6 +82,6 @@ public class RequestPagerTest {
     }
 
     private RequestBuilder requestForCurrentPageAndRows(final int currentPage, final int rowsPerPage) {
-        return RequestBuilder.get("/somePath").withQuery(Pager.CURRENT_PAGE_PARAM, currentPage).withQuery(Pager.ROWS_PER_PAGE_PARAM, rowsPerPage);
+        return RequestBuilder.get("/somePath").query(Pager.CURRENT_PAGE_PARAM, currentPage).query(Pager.ROWS_PER_PAGE_PARAM, rowsPerPage);
     }
 }
