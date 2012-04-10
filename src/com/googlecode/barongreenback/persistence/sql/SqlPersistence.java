@@ -14,6 +14,10 @@ public class SqlPersistence implements Persistence{
 
     @Override
     public void deleteAll() throws Exception {
-        sqlRecords.update(textOnly("DROP ALL OBJECTS"));
+        sqlRecords.update(textOnly("drop all objects"));
+    }
+
+    public static String h2Mem() {
+        return "jdbc:h2:mem:baron-greenback";
     }
 }

@@ -12,6 +12,7 @@ import org.junit.Ignore;
 import java.util.Properties;
 
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneTemporaryDirectory;
+import static com.googlecode.barongreenback.persistence.sql.SqlPersistence.h2Mem;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 

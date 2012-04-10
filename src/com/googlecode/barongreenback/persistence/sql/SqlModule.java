@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.persistence.sql;
 
+import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.persistence.PersistenceRequestScope;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.Schema;
@@ -18,6 +19,7 @@ public class SqlModule implements RequestScopedModule {
     public Module addPerRequestObjects(Container requestScope) throws Exception {
         final Container container = requestScope.get(PersistenceRequestScope.class).value();
         container.addActivator(Connection.class, ConnectionActivator.class);
+        container.add(Persistence.class, SqlPersistence.class);
         container.add(SqlMappings.class);
         container.add(Schema.class, SqlSchema.class);
         container.add(SqlRecords.class);

@@ -19,12 +19,12 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
         final Container container = applicationScope.get(PersistenceApplicationScope.class).value();
         container.addActivator(Directory.class, DirectoryActivator.class);
         container.add(LuceneStorage.class, OptimisedStorage.class);
-        container.add(Persistence.class, LucenePersistence.class);
         return this;
     }
 
     public Module addPerRequestObjects(final Container requestScope) {
         final Container container = requestScope.get(PersistenceRequestScope.class).value();
+        container.add(Persistence.class, LucenePersistence.class);
         container.add(LuceneMappings.class);
         container.add(Records.class, LuceneRecords.class);
         return this;

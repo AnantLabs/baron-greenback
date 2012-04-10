@@ -21,6 +21,7 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         container.addInstance(StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
         container.add(Logger.class, IgnoreLogger.class);
         container.add(PersistenceRequestScope.class);
+        container.addActivator(Persistence.class, PersistenceActivator.class);
         container.addActivator(BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         return this;
     }
@@ -32,7 +33,6 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         container.add(PersistenceUser.class);
         container.add(PersistencePassword.class);
         container.add(PersistenceApplicationScope.class);
-        container.addActivator(Persistence.class, PersistenceActivator.class);
         return this;
     }
 

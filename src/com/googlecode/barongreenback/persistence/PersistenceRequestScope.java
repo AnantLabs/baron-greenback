@@ -23,6 +23,6 @@ public class PersistenceRequestScope implements Value<Container>, Closeable {
 
     @Override
     public void close() throws IOException {
-        value.close();
+//        value.close();
     }
 }

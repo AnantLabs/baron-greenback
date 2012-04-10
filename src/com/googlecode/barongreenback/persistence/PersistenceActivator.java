@@ -5,14 +5,14 @@ import com.googlecode.yadic.Container;
 import java.util.concurrent.Callable;
 
 public class PersistenceActivator implements Callable<Persistence> {
-    private final Container applicationScope;
+    private final Container requestScope;
 
-    public PersistenceActivator(PersistenceApplicationScope applicationScope) {
-        this.applicationScope = applicationScope.value();
+    public PersistenceActivator(PersistenceRequestScope requestScope) {
+        this.requestScope = requestScope.value();
     }
 
     @Override
     public Persistence call() throws Exception {
-        return applicationScope.get(Persistence.class);
+        return requestScope.get(Persistence.class);
     }
 }
