@@ -11,6 +11,7 @@ import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
+import javax.sound.midi.SysexMessage;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,18 +19,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 public class LessCssHandler implements HttpHandler {
-    private static final Map<Uri, String> cache = new ConcurrentHashMap<Uri, String>();
+    private final LessCssCache cache;
     private final HttpHandler httpHandler;
     private final LessCompiler lessCompiler;
     private final LessCssConfig config;
 
-    public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config) {
+    public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config, LessCssCache cache) {
         this.httpHandler = httpHandler;
         this.lessCompiler = lessCompiler;
         this.config = config;
+        this.cache = cache;
     }
 
     public Response handle(Request request) throws Exception {
+        long start = System.currentTimeMillis();
         Response response = httpHandler.handle(request);
 
         Uri uri = request.uri();
@@ -37,11 +40,13 @@ public class LessCssHandler implements HttpHandler {
             return response;
         }
         String less = response.entity().toString();
-        return ResponseBuilder.modify(response).entity(processLess(uri, less)).build();
+        Response build = ResponseBuilder.modify(response).entity(processLess(uri, less)).build();
+        System.out.println("Less Generation took :  " + (System.currentTimeMillis() - start));
+        return build;
     }
 
     private String processLess(Uri uri, String less) throws IOException {
-        if (cache.containsKey(uri) && config.useCache()) {
+        if (cache.containsKey(uri) /*&& config.useCache()*/) {
             return cache.get(uri);
         }
         String result = lessCompiler.compile(less, new Loader(uri));
