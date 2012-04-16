@@ -46,7 +46,7 @@ public class LessCssHandler implements HttpHandler {
     }
 
     private String processLess(Uri uri, String less) throws IOException {
-        if (cache.containsKey(uri) /*&& config.useCache()*/) {
+        if (cache.containsKey(uri) && config.useCache()) {
             return cache.get(uri);
         }
         String result = lessCompiler.compile(less, new Loader(uri));
