@@ -32,7 +32,6 @@ public class LessCssHandler implements HttpHandler {
     }
 
     public Response handle(Request request) throws Exception {
-        long start = System.currentTimeMillis();
         Response response = httpHandler.handle(request);
 
         Uri uri = request.uri();
@@ -40,9 +39,7 @@ public class LessCssHandler implements HttpHandler {
             return response;
         }
         String less = response.entity().toString();
-        Response build = ResponseBuilder.modify(response).entity(processLess(uri, less)).build();
-        System.out.println("Less Generation took :  " + (System.currentTimeMillis() - start));
-        return build;
+        return ResponseBuilder.modify(response).entity(processLess(uri, less)).build();
     }
 
     private String processLess(Uri uri, String less) throws IOException {

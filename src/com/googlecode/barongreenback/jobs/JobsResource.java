@@ -141,6 +141,4 @@ public class JobsResource {
                 add("status", response.status().description()).
                 add("entity", response.entity().toString());
     }
-
-
 }
