@@ -9,7 +9,6 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
@@ -17,6 +16,7 @@ import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
@@ -26,8 +26,8 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Using.using;
-import static com.googlecode.totallylazy.Callables.toClass;
-import static com.googlecode.totallylazy.Pair.pair;
+import static com.googlecode.totallylazy.Sequences.forwardOnly;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Uri.uri;
 import static java.util.UUID.randomUUID;
 
@@ -61,15 +61,16 @@ public class SequentialCrawler implements Crawler {
         Uri uri = uri(from);
         Object lastCheckPoint = convertFromString(checkpoint, checkpointType);
 
-        Sequence<Record> records = new CompositeCrawler(httpClient, log).crawl(uri, more, lastCheckPoint, recordDefinition);
-        Option<Record> head = records.headOption();
-        if (head.isEmpty()) {
+        Iterator<Record> recordIterator = new CompositeCrawler(httpClient, log).crawl(uri, more, lastCheckPoint, recordDefinition).iterator();
+        if (!recordIterator.hasNext()) {
             return 0;
         }
 
-        checkPointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head.get()));
+        Record head = recordIterator.next();
 
-        return put(update, recordDefinition, records.cons(head.get()));
+        checkPointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head));
+
+        return put(update, recordDefinition, sequence(head).join(forwardOnly(recordIterator)));
     }
 
     private Number put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) {
@@ -101,34 +102,4 @@ public class SequentialCrawler implements Crawler {
     private Option<Object> getFirstCheckPoint(Record record) {
         return extractCheckpoint(record);
     }
-
-    private Callable1<? super Object, String> mapAsString() {
-        return new Callable1<Object, String>() {
-            public String call(Object instance) throws Exception {
-                return mappings.toString(instance.getClass(), instance);
-            }
-        };
-    }
-
-    private String convertToString(Option<Object> checkPoint) {
-
-        return checkPoint.map(mapAsString()).getOrElse("");
-    }
-
-    private String getCheckPointType(Option<Object> checkpoint) {
-        return checkpoint.map(toClass()).
-                map(className()).
-                getOrElse(String.class.getName());
-    }
-
-    private static Callable1<? super Class, String> className() {
-        return new Callable1<Class, String>() {
-            public String call(Class aClass) throws Exception {
-                return aClass.getName();
-            }
-        };
-    }
-
-
-
 }
