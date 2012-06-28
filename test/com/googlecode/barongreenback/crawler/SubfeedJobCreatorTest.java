@@ -14,7 +14,6 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.SimpleContainer;
 import org.junit.Test;
 
-import static com.googlecode.barongreenback.crawler.SubfeedDatasource.dataSource;
 import static com.googlecode.barongreenback.crawler.SubfeedJobCreator.process;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keywords.UNIQUE;
@@ -48,12 +47,12 @@ public class SubfeedJobCreatorTest {
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
         Pair<Keyword<?>, Object> previousUnique = cast(Pair.pair(PREV_UNIQUE, "bar"));
         Sequence<StagedJob<Response>> job = SubfeedJobCreator.createSubfeedJobs(new SimpleContainer(), one(record().set(LINK, URI)), SOME_DESTINATION, one(previousUnique));
-        assertThat(((SubfeedDatasource) job.head().dataSource()).uniqueIdentifiers(), is(sequence(previousUnique, Pair.<Keyword<?>, Object>pair(LINK, URI))));
+        assertThat(((SubfeedDatasource) job.head().dataSource()).data(), is(sequence(previousUnique, Pair.<Keyword<?>, Object>pair(LINK, URI))));
     }
 
     @Test
     public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
-        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> records = process(new SimpleContainer(), dataSource(null, null, one(Pair.<Keyword<?>, Object>pair(LINK, URI))), SOME_DESTINATION, one(record().set(PERSON_NAME, "Dan")));
-        assertThat(records.first(), is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
+        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> records = process(new SimpleContainer(), SubfeedDatasource.datasource(null, null, one(Pair.<Keyword<?>, Object>pair(LINK, URI))), SOME_DESTINATION, one(record().set(PERSON_NAME, "Dan")));
+        assertThat(records.first(), is(one(record().set(LINK, URI).set(PERSON_NAME, "Dan"))));
     }
 }

@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
+import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Uri.uri;
@@ -51,6 +52,10 @@ public abstract class AbstractCrawler implements Crawler {
         return RecordDefinition.allFields(definition).map(ignoreAlias());
     }
 
+    public static Sequence<Keyword<?>> allKeywords(Sequence<Keyword<?>> keywords) {
+        return RecordDefinition.allFields(keywords).map(ignoreAlias());
+    }
+
     public static Definition definition(Model crawler, RecordDefinition recordDefinition) {
         return definition(crawler, recordDefinition.definition());
     }
@@ -81,7 +86,7 @@ public abstract class AbstractCrawler implements Crawler {
 
     public static Definition destinationDefinition(Model crawler) {
         String name = crawler.get("update", String.class);
-        List<Model> keywords = crawler.get("record", Model.class).getValues("keywords", Model.class);
-        return RecordDefinition.convertToDefinition(name, keywords);
+        List<Model> keywordsModel = crawler.get("record", Model.class).getValues("keywords", Model.class);
+        return Definition.constructors.definition(name, allKeywords(toKeywords(keywordsModel)));
     }
 }

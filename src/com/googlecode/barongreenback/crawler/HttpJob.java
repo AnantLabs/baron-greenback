@@ -24,9 +24,9 @@ public class HttpJob implements StagedJob<Response> {
         this.context = unmodifiableMap(context);
     }
 
-    public static HttpJob job(Container container, HttpDataSource dataSource, Definition destination) {
+    public static HttpJob job(Container container, HttpDatasource datasource, Definition destination) {
         ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
-        context.put("dataSource", dataSource);
+        context.put("dataSource", datasource);
         context.put("destination", destination);
         return new HttpJob(container, context);
     }
@@ -37,8 +37,8 @@ public class HttpJob implements StagedJob<Response> {
     }
 
     @Override
-    public HttpDataSource dataSource() {
-        return (HttpDataSource) context.get("dataSource");
+    public HttpDatasource dataSource() {
+        return (HttpDatasource) context.get("dataSource");
     }
 
     @Override
@@ -51,7 +51,7 @@ public class HttpJob implements StagedJob<Response> {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
-                return SubfeedJobCreator.process(container, dataSource(), destination(), transformData(loadDocument(response), dataSource().definition()).realise());
+                return SubfeedJobCreator.process(container, dataSource(), destination(), transformData(loadDocument(response), dataSource().source()).realise());
             }
         };
     }

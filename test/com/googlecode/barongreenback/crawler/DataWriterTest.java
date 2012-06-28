@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.lazyrecords.*;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,14 +17,14 @@ import static org.junit.Assert.assertThat;
 
 public class DataWriterTest {
     @Test
-    public void shouldWriteDataToRecords() throws Exception {
+    public void shouldNotWriteDataToRecordsWhenNotUnique() throws Exception {
         Records records = new MemoryRecords();
         Keyword<String> name = Keywords.keyword("name", String.class);
         Definition children = definition("children", name);
         Record expected = record().set(name, "Dan");
         new DataWriter(records).writeUnique(children, one(expected));
         Sequence<Record> result = records.get(children);
-        assertThat(result, is(one(expected)));
+        assertThat(result, is(Sequences.<Record>empty()));
     }
 
     @Test

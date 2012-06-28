@@ -40,7 +40,9 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> processDocument(Document document, Container container) {
-        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filterToCheckpoint(transformData(document, dataSource().definition())));
+        Sequence<Record> events = transformData(document, dataSource().source());
+        Sequence<Record> filtered = filterToCheckpoint(events);
+        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filtered);
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
     }
 
@@ -71,9 +73,9 @@ public class PaginatedHttpJob extends HttpJob {
         return selectCheckpoints(document).contains(checkpointAsString());
     }
 
-    private PaginatedHttpJob job(HttpDataSource dataSource) {
+    private PaginatedHttpJob job(HttpDatasource datasource) {
         ConcurrentHashMap<String, Object> newContext = new ConcurrentHashMap<String, Object>(context);
-        newContext.put("dataSource", dataSource);
+        newContext.put("dataSource", datasource);
         return paginatedHttpJob(container(), newContext, mappings);
     }
 

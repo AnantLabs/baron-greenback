@@ -19,7 +19,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
-import static com.googlecode.totallylazy.Runnables.VOID;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final InputHandler inputHandler;
@@ -51,23 +50,21 @@ public class QueuesCrawler extends AbstractCrawler {
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
 
-        updateView(crawler, keywords(destination));
+        updateView(crawler, destination.fields());
 
-        HttpDataSource dataSource = HttpDataSource.dataSource(from(crawler), source);
+        HttpDatasource datasource = HttpDatasource.dataSource(from(crawler), source);
 
-        CheckpointUpdater checkpointUpdater = new CheckpointUpdater(checkpointUpdater(id, crawler));
+        Container crawlContainer = crawlContainer(id, crawler);
 
-        Container container = crawlContainer();
+        crawl(masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
 
-        crawl(masterPaginatedHttpJob(container, dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, checkpointUpdater));
+        crawlContainer.get(CountLatch.class).await();
 
-        container.get(CountLatch.class).await();
-
-        return container.get(AtomicInteger.class).get();
+        return crawlContainer.get(AtomicInteger.class).get();
     }
  
 
-    private Container crawlContainer() {
+    private Container crawlContainer(UUID id, Model crawler) {
         Container container = new SimpleContainer();
         container.addInstance(PrintStream.class, log);
         container.add(Auditor.class, PrintAuditor.class);
@@ -77,23 +74,14 @@ public class QueuesCrawler extends AbstractCrawler {
         container.add(FailureHandler.class);
         container.add(CountLatch.class);
         container.addInstance(AtomicInteger.class, new AtomicInteger(0));
+        container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointHandler, id, crawler));
         return container;
     }
 
     public Future<?> crawl(StagedJob<Response> job) {
         return submit(inputHandler, HttpReader.getInput(job).then(
                 submit(processHandler, processJobs(job.process()).then(
-                        submit(outputHandler, DataWriter.write(application, job.destination(), job.container()), job.container())), job.container())), job.container());
-    }
-
-    private Function1<Option<?>, Void> checkpointUpdater(final UUID id, final Model crawler) {
-        return new Function1<Option<?>, Void>() {
-            @Override
-            public Void call(Option<?> checkpoint) throws Exception {
-                checkpointHandler.updateCheckPoint(id, crawler, checkpoint);
-                return VOID;
-            }
-        };
+                        submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
     }
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable runnable, final Container container) {

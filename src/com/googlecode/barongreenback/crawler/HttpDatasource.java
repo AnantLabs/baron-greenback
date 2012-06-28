@@ -1,32 +1,29 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
-import org.w3c.dom.Document;
 
-import static com.googlecode.totallylazy.Option.none;
-
-public class HttpDataSource {
+public class HttpDatasource {
     protected final Uri uri;
     protected final Definition source;
 
-    public HttpDataSource(Uri uri, Definition source) {
+    public HttpDatasource(Uri uri, Definition source) {
         this.uri = uri;
         this.source = source;
     }
 
-    public static HttpDataSource dataSource(Uri uri, Definition source) {
-        return new HttpDataSource(uri, source);
+    public static HttpDatasource dataSource(Uri uri, Definition source) {
+        return new HttpDatasource(uri, source);
     }
 
-    public HttpDataSource uri(Uri uri) {
-        return new HttpDataSource(uri, source);
+    public HttpDatasource uri(Uri uri) {
+        return new HttpDatasource(uri, source);
     }
 
     public Uri uri() {
@@ -37,7 +34,11 @@ public class HttpDataSource {
         return RequestBuilder.get(uri).build();
     }
 
-    public Definition definition() {
+    public Definition source() {
         return source;
+    }
+
+    public Sequence<Pair<Keyword<?>, Object>> data() {
+        return Sequences.empty();
     }
 }

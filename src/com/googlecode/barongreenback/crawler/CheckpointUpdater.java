@@ -1,16 +1,23 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 
-public class CheckpointUpdater {
-    private final Function1<Option<?>, Void> updater;
+import java.util.UUID;
 
-    public CheckpointUpdater(Function1<Option<?>, Void> updater) {
-        this.updater = updater;
+public class CheckpointUpdater {
+    private final CheckPointHandler checkpointHandler;
+    private final UUID id;
+    private final Model crawler;
+
+    public CheckpointUpdater(CheckPointHandler checkpointHandler, UUID id, Model crawler) {
+        this.checkpointHandler = checkpointHandler;
+        this.id = id;
+        this.crawler = crawler;
     }
 
-    public void update(Option<?> value) throws Exception {
-        updater.call(value);
+    public void update(Option<?> checkooint) throws Exception {
+        checkpointHandler.updateCheckPoint(id, crawler, checkooint);
     }
 }

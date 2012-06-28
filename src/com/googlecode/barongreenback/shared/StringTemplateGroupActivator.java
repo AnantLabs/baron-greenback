@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.shared;
 
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.crawler.HttpDataSource;
+import com.googlecode.barongreenback.crawler.HttpDatasource;
 import com.googlecode.barongreenback.crawler.SubfeedDatasource;
 import com.googlecode.barongreenback.search.pager.PagerRenderer;
 import com.googlecode.barongreenback.search.pager.RequestPager;
@@ -45,16 +45,16 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
         shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer(shared));
-        shared.registerRenderer(instanceOf(HttpDataSource.class), new Renderer<HttpDataSource>() {
+        shared.registerRenderer(instanceOf(HttpDatasource.class), new Renderer<HttpDatasource>() {
             @Override
-            public String render(HttpDataSource httpDataSource) throws Exception {
-                return "HTTPDDATASOURCES:" + httpDataSource.toString();
+            public String render(HttpDatasource httpDatasource) throws Exception {
+                return "HTTPDDATASOURCES:" + httpDatasource.toString();
             }
         });
-        shared.registerRenderer(instanceOf(SubfeedDatasource.class), new Renderer<HttpDataSource>() {
+        shared.registerRenderer(instanceOf(SubfeedDatasource.class), new Renderer<HttpDatasource>() {
             @Override
-            public String render(HttpDataSource httpDataSource) throws Exception {
-                return "SUBFEEDS!:" + httpDataSource.toString();
+            public String render(HttpDatasource httpDatasource) throws Exception {
+                return "SUBFEEDS!:" + httpDatasource.toString();
             }
         });
         return new EnhancedStringTemplateGroup(baseUrl, shared);

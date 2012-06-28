@@ -1,9 +1,6 @@
 package com.googlecode.barongreenback;
 
-import com.googlecode.barongreenback.crawler.CountDownScheduler;
-import com.googlecode.barongreenback.crawler.CrawlerImportPage;
-import com.googlecode.barongreenback.crawler.CrawlerListPage;
-import com.googlecode.barongreenback.crawler.CrawlerPage;
+import com.googlecode.barongreenback.crawler.*;
 import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.queues.Completer;
@@ -18,6 +15,7 @@ import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.waitrest.Waitrest;
+import com.googlecode.yadic.Container;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,8 +79,8 @@ public class EndToEndTest extends ApplicationTests {
     @Test
     public void createCrawlerViaImportWithSubfeedAndThenViewAllRecords() throws Exception {
         crawlSampleData(importCrawler("testCrawler.json"), "test");
+//        crawlSampleData(importCrawler("testQueuesCrawler.json"), "test");
         ViewSearchPage viewSearchPage = view("test");
-        System.out.println("viewSearchPage = " + viewSearchPage);
 
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
 

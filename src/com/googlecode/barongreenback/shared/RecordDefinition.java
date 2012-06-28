@@ -54,8 +54,8 @@ public class RecordDefinition {
         return uniqueFields(recordDefinition.definition());
     }
 
-    public static Sequence<Keyword<?>> uniqueFields(Definition definition1) {
-        return allFields(definition1).filter(UNIQUE_FILTER);
+    public static Sequence<Keyword<?>> uniqueFields(Definition definition) {
+        return allFields(definition).filter(UNIQUE_FILTER);
     }
 
     public static Sequence<Keyword<?>> allFields(RecordDefinition recordDefinition) {
@@ -64,6 +64,10 @@ public class RecordDefinition {
 
     public static Sequence<Keyword<?>> allFields(Definition definition) {
         return definition.fields().flatMap(allFields());
+    }
+
+    public static Sequence<Keyword<?>> allFields(Sequence<Keyword<?>> keywords) {
+        return keywords.flatMap(allFields());
     }
 
     public static Callable1<Keyword<?>, Sequence<Keyword<?>>> allFields() {

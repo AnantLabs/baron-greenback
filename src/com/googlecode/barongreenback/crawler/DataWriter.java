@@ -1,20 +1,18 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.lazyrecords.*;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
+import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.lazyrecords.Using.using;
+import static com.googlecode.totallylazy.Callables.first;
+import static com.googlecode.totallylazy.Predicates.*;
 
 public class DataWriter {
     private final Records records;
@@ -31,15 +29,19 @@ public class DataWriter {
         if (newRecords.isEmpty()) return 0;
 
         try {
-            Sequence<Keyword<?>> unique = destination.fields().filter(UNIQUE_FILTER);
-            return records.put(destination, Record.methods.update(using(unique), newRecords));
+            Sequence<Keyword<?>> unique = uniqueFields(destination);
+            if(newRecords.head().fields().map(Callables.<Keyword<?>>first()).exists(in(unique))) {
+                return records.put(destination, Record.methods.update(using(unique), newRecords));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+
+        return 0;
     }
 
-    public static Function1<Sequence<Record>, Number> write(final Application application, final Definition destination, final Container crawlContainer) {
+    public static Function1<Sequence<Record>, Number> write(final Application application, final StagedJob<Response> job) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {
@@ -47,8 +49,8 @@ public class DataWriter {
                     @Override
                     public Number call(Container container) throws Exception {
                         try {
-                            Number updated = new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(destination, newData);
-                            crawlContainer.get(AtomicInteger.class).addAndGet(updated.intValue());
+                            Number updated = new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(job.destination(), newData);
+                            job.container().get(AtomicInteger.class).addAndGet(updated.intValue());
                             return updated;
                         } catch (Exception e) {
                             e.printStackTrace();

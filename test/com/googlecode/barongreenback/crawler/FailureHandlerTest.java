@@ -17,9 +17,9 @@ public class FailureHandlerTest {
     public void shouldPlaceOnRetryQueueIfFailed() throws Exception {
         CrawlerFailures crawlerFailures = new CrawlerFailures();
         FailureHandler failureHandler = new FailureHandler(crawlerFailures);
-        HttpDataSource dataSource = new HttpDataSource(uri("/any/uri"), null);
+        HttpDatasource datasource = new HttpDatasource(uri("/any/uri"), null);
         Response originalResponse = ResponseBuilder.response(Status.NOT_FOUND).build();
-        HttpJob expectedJob = HttpJob.job(new SimpleContainer(), dataSource, Definition.constructors.definition(null, null));
+        HttpJob expectedJob = HttpJob.job(new SimpleContainer(), datasource, Definition.constructors.definition(null, null));
         Response response = failureHandler.captureFailures(expectedJob, originalResponse);
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
@@ -29,9 +29,9 @@ public class FailureHandlerTest {
     @Test
     public void shouldReturnOriginalResponseWhenOk() throws Exception {
         CrawlerFailures crawlerFailures = new CrawlerFailures();
-        HttpDataSource dataSource = new HttpDataSource(uri("/any/uri"), null);
+        HttpDatasource datasource = new HttpDatasource(uri("/any/uri"), null);
         Response expectedResponse = ResponseBuilder.response(Status.OK).build();
-        Response response = captureFailures(HttpJob.job(new SimpleContainer(), dataSource, Definition.constructors.definition(null, null)), crawlerFailures, expectedResponse);
+        Response response = captureFailures(HttpJob.job(new SimpleContainer(), datasource, Definition.constructors.definition(null, null)), crawlerFailures, expectedResponse);
         assertThat(response, is(expectedResponse));
         assertThat(crawlerFailures.values().values().size(), is(0));
     }

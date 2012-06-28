@@ -6,19 +6,19 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
-public class SubfeedDatasource extends HttpDataSource {
-    private final Sequence<Pair<Keyword<?>, Object>> uniqueIdentifiers;
+public class SubfeedDatasource extends HttpDatasource {
+    private final Sequence<Pair<Keyword<?>, Object>> data;
 
-    private SubfeedDatasource(Uri uri, Definition source, Sequence<Pair<Keyword<?>, Object>> uniqueIdentifiers) {
+    private SubfeedDatasource(Uri uri, Definition source, Sequence<Pair<Keyword<?>, Object>> data) {
         super(uri, source);
-        this.uniqueIdentifiers = uniqueIdentifiers;
+        this.data = data;
     }
 
-    public static SubfeedDatasource dataSource(Uri uri, Definition source, Sequence<Pair<Keyword<?>, Object>> uniqueIdentifiers) {
-        return new SubfeedDatasource(uri, source, uniqueIdentifiers);
+    public static SubfeedDatasource datasource(Uri uri, Definition source, Sequence<Pair<Keyword<?>, Object>> data) {
+        return new SubfeedDatasource(uri, source, data);
     }
 
-    public Sequence<Pair<Keyword<?>, Object>> uniqueIdentifiers() {
-        return uniqueIdentifiers;
+    public Sequence<Pair<Keyword<?>, Object>> data() {
+        return data;
     }
 }

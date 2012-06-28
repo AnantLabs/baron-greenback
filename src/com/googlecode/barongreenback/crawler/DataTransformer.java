@@ -11,9 +11,7 @@ import static com.googlecode.totallylazy.Xml.document;
 
 public class DataTransformer {
     public static Sequence<Record> transformData(Document document, Definition source) {
-        final Sequence<Record> data = new DocumentFeeder().get(document, source).map(copy()).realise();
-        final Sequence<Record> records = DuplicateRemover.filterDuplicates(source, data);
-        return records.realise();
+        return new DocumentFeeder().get(document, source).map(copy()).realise();
     }
 
     public static Document loadDocument(Response response) {
@@ -29,7 +27,7 @@ public class DataTransformer {
     }
 
     public static Function1<Record, Record> copy() {
-        return  new Function1<Record, Record>() {
+        return new Function1<Record, Record>() {
             @Override
             public Record call(Record record) throws Exception {
                 return copy(record);

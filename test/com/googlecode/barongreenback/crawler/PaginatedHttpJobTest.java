@@ -31,7 +31,7 @@ public class PaginatedHttpJobTest {
         context.put("moreXPath", "/root/more");
         context.put("checkpointAsString", "Today");
         context.put("checkpointXPath", "/root/date");
-        context.put("dataSource", HttpDataSource.dataSource(Uri.uri("http://go.away.com"), null));
+        context.put("dataSource", HttpDatasource.dataSource(Uri.uri("http://go.away.com"), null));
         PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(new SimpleContainer(), context, null);
         Option<PaginatedHttpJob> more = job.nextPageJob(document("<root><date>Yesterday</date><more>next</more></root>"));
         assertThat(more.get().dataSource().uri(), is(Uri.uri("next")));
