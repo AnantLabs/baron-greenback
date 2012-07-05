@@ -2,6 +2,8 @@ package com.googlecode.barongreenback.batch;
 
 import com.googlecode.barongreenback.shared.messages.Category;
 
+import static java.lang.String.format;
+
 public class Message {
     private final Category category;
     private final String message;
@@ -17,5 +19,10 @@ public class Message {
 
     public String message() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        return format("%s: '%s'", category, message);
     }
 }

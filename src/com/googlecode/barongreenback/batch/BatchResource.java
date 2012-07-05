@@ -212,10 +212,11 @@ public class BatchResource {
     }
 
     private void deleteAllData() throws Exception {
-        cache.clear();
+        persistence.delete(); // Delete data twice so that no new jobs will be created
         scheduler.stop();
         queues.deleteAll();
         persistence.delete();
+        cache.clear();
     }
 
     private Callable1<File, Model> asModel() {

@@ -3,13 +3,13 @@ package com.googlecode.barongreenback.batch;
 import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.ImportCrawlerPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
-import com.googlecode.barongreenback.shared.messages.Category;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.File;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.contentOf;
+import static com.googlecode.barongreenback.shared.messages.Category.SUCCESS;
 import static com.googlecode.totallylazy.Files.delete;
 import static com.googlecode.totallylazy.Files.randomFilename;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
@@ -18,10 +18,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class BatchResourceTest extends ApplicationTests {
     @Test
-    public void canDeleteTheIndex() throws Exception {
+    public void deleteAllBackupsData() throws Exception {
         importOneCrawler();
-        deleteTheIndex();
+        Message message = deleteTheIndex().message();
+        assertThat(message.category(), Matchers.is(SUCCESS));
         assertThat(numberOfCrawlers(), is(0));
+
+        File file = extractFile(message);
+        assertThat(file.exists(), Matchers.is(true));
+        delete(file);
     }
 
     @Test
@@ -30,13 +35,21 @@ public class BatchResourceTest extends ApplicationTests {
         importOneCrawler();
 
         backupDataTo(backupLocation);
-        deleteTheIndex();
+        deleteIndexAndRemoveAutomaticBackup();
         assertThat(numberOfCrawlers(), is(0));
 
         restoreFrom(backupLocation);
         assertThat(numberOfCrawlers(), is(1));
 
         delete(backupLocation);
+    }
+
+    private boolean deleteIndexAndRemoveAutomaticBackup() throws Exception {
+        return delete(extractFile(deleteTheIndex().message()));
+    }
+
+    private File extractFile(Message message) {
+        return new File(message.message().split(":")[1].trim());
     }
 
     private BatchOperationsPage restoreFrom(File backupLocation) throws Exception {
@@ -72,7 +85,7 @@ public class BatchResourceTest extends ApplicationTests {
 
     private BatchOperationsPage verifySuccess(BatchOperationsPage page) {
         Message message = page.message();
-        assertThat(message.message(), message.category(), Matchers.is(Category.SUCCESS));
+        assertThat(message.message(), message.category(), Matchers.is(SUCCESS));
         return page;
     }
 }
