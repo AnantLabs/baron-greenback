@@ -35,6 +35,7 @@ import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.unwrap;
+import static com.googlecode.barongreenback.views.Views.view;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -126,7 +127,11 @@ public class SearchResource {
     private Callable1<Sequence<Record>, Model> listResults(final String viewName, final String query) {
         return new Callable1<Sequence<Record>, Model>() {
             @Override
-            public Model call(Sequence<Record> results) throws Exception {
+            public Model call(Sequence<Record> unpaged) throws Exception {
+                Option<Model> view = recordsService.findView(viewName);
+                if (view.isEmpty()) return baseModel(viewName, query);
+
+                Sequence<Record> results = pager.paginate(sorter.sort(unpaged, headers(view.get())));
                 if (results.isEmpty()) return baseModel(viewName, query);
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
@@ -136,7 +141,7 @@ public class SearchResource {
                         add("sorter", sorter).
                         add("sortLinks", sorter.sortLinks(visibleHeaders)).
                         add("sortedHeaders", sorter.sortedHeaders(visibleHeaders)).
-                        add("results", pager.paginate(sorter.sort(results, headers(recordsService.view(viewName)))).map(asModel(viewName, visibleHeaders)).toList());
+                        add("results", results.map(asModel(viewName, visibleHeaders)).toList());
             }
         };
     }

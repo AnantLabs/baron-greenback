@@ -94,7 +94,7 @@ public class RecordsService {
         return findView(view).get();
     }
 
-    private Option<Model> findView(String view) {
+    public Option<Model> findView(String view) {
         return Views.find(modelRepository, view);
     }
 
