@@ -1,8 +1,10 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.html.Link;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -13,11 +15,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class ViewSearchPage {
+    private static final String NEXT_PAGE_XPATH = "//div[@class='pagination']/ul/li[@class='next page']/a";
     private final HttpHandler httpHandler;
     private final Html html;
 
-    public ViewSearchPage(HttpHandler httpHandler, String view, String query) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, query)))).build()));
+    public ViewSearchPage(HttpHandler httpHandler, String view, int rowsPerPage) throws Exception {
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, "")))).query(Pager.ROWS_PER_PAGE_PARAM, rowsPerPage).build()));
+    }
+
+    public ViewSearchPage(HttpHandler httpHandler, String view, String searchQuery) throws Exception {
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, searchQuery)))).build()));
     }
 
     public ViewSearchPage(HttpHandler httpHandler, Response response) throws Exception {
@@ -43,5 +50,14 @@ public class ViewSearchPage {
     @Override
     public String toString() {
         return html.toString();
+    }
+
+    public ViewSearchPage nextPage() throws Exception {
+        Link link = html.link(NEXT_PAGE_XPATH);
+        return new ViewSearchPage(httpHandler, httpHandler.handle(link.click()));
+    }
+
+    public boolean hasNextPage() {
+        return html.contains(NEXT_PAGE_XPATH);
     }
 }

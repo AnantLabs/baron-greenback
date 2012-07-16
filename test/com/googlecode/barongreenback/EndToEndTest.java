@@ -6,6 +6,7 @@ import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.queues.Completer;
 import com.googlecode.barongreenback.queues.CountDownCompleter;
 import com.googlecode.barongreenback.search.ViewSearchPage;
+import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
@@ -37,6 +38,20 @@ import static org.hamcrest.Matchers.nullValue;
 
 public class EndToEndTest extends ApplicationTests {
     private Waitrest waitrest;
+
+    @Test
+    public void paginationWorksCorrectly() throws Exception {
+        crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:20Z")), "newsfeed");
+        ViewSearchPage page1 = viewWithPageSize("newsfeed", 1);
+        assertThat(page1.resultsSize(), NumberMatcher.is(1));
+
+        ViewSearchPage page2 = page1.nextPage();
+        assertThat(page2.resultsSize(), NumberMatcher.is(1));
+
+        ViewSearchPage page3 = page2.nextPage();
+        assertThat(page3.resultsSize(), NumberMatcher.is(1));
+        assertThat(page3.hasNextPage(), is(false));
+    }
 
     @Test
     public void createCrawlerViaUiWithCheckpointOnFirstPage() throws Exception {
@@ -117,6 +132,10 @@ public class EndToEndTest extends ApplicationTests {
         final Request request = crawlerListPage.linkFor("newsfeed").click();
         final CrawlerPage crawlerPage = new CrawlerPage(browser, browser.handle(request));
         return crawlerPage.checkpoint().value();
+    }
+
+    private ViewSearchPage viewWithPageSize(String name, int pageSize) throws Exception {
+        return new ViewSearchPage(browser, name, pageSize);
     }
 
     private ViewSearchPage view(String name) throws Exception {

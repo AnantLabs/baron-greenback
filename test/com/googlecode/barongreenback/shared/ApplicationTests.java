@@ -7,6 +7,7 @@ import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
+import com.googlecode.utterlyidle.html.Browser;
 import com.googlecode.utterlyidle.html.RelativeUrlHandler;
 import com.googlecode.yadic.Container;
 import org.junit.After;
@@ -34,7 +35,7 @@ public abstract class ApplicationTests {
                 return null;
             }
         });
-        browser = new RedirectHttpHandler(new RelativeUrlHandler(application));
+        browser = Browser.browser(application);
     }
 
 }
