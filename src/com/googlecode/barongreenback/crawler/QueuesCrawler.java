@@ -27,23 +27,18 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields
 
 public class QueuesCrawler extends AbstractCrawler {
     private final CrawlerHttpClient crawlerHttpHandler;
-    private final InputHandler inputHandler;
-    private final ProcessHandler processHandler;
-    private final OutputHandler outputHandler;
+    private final CrawlerExecutors crawlerExecutors;
     private final Application application;
     private final PrintStream log;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
     private final CrawlerFailures retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final Application application, final CrawlerHttpClient crawlerHttpHandler, InputHandler inputHandler,
-                         ProcessHandler processHandler, OutputHandler outputHandler, CheckPointHandler checkpointHandler,
+    public QueuesCrawler(final ModelRepository modelRepository, final Application application, final CrawlerHttpClient crawlerHttpHandler, CrawlerExecutors crawlerExecutors, CheckPointHandler checkpointHandler,
                          StringMappings mappings, CrawlerFailures retry, PrintStream log) {
         super(modelRepository);
         this.crawlerHttpHandler = crawlerHttpHandler;
-        this.inputHandler = inputHandler;
-        this.processHandler = processHandler;
-        this.outputHandler = outputHandler;
+        this.crawlerExecutors = crawlerExecutors;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
         this.retry = retry;
@@ -73,9 +68,9 @@ public class QueuesCrawler extends AbstractCrawler {
 
 
     public Future<?> crawl(StagedJob job) {
-        return submit(inputHandler, HttpReader.getInput(job).then(
-                submit(processHandler, processJobs(job.process()).then(
-                        submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
+        return submit(crawlerExecutors.inputHandler(), HttpReader.getInput(job).then(
+                submit(crawlerExecutors.processHandler(), processJobs(job.process()).then(
+                        submit(crawlerExecutors.outputHandler(), DataWriter.write(application, job), job.container())), job.container())), job.container());
     }
 
     private Container crawlContainer(UUID id, Model crawler) {

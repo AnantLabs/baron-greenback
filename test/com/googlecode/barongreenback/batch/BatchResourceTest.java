@@ -88,4 +88,6 @@ public class BatchResourceTest extends ApplicationTests {
         assertThat(message.message(), message.category(), Matchers.is(SUCCESS));
         return page;
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.batch;
 
+import com.googlecode.barongreenback.crawler.CrawlerExecutors;
 import com.googlecode.barongreenback.jobs.HttpScheduler;
 import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.queues.Queues;
@@ -61,9 +62,10 @@ public class BatchResource {
     private final Queues queues;
     private final ModelCache cache;
     private final Clock clock;
+    private final CrawlerExecutors crawlerExecutors;
 
     public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final Persistence persistence, final HttpScheduler scheduler,
-                         final Queues queues, final ModelCache cache, final Clock clock) {
+                         final Queues queues, final ModelCache cache, final Clock clock, CrawlerExecutors crawlerExecutors) {
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.persistence = persistence;
@@ -71,6 +73,7 @@ public class BatchResource {
         this.queues = queues;
         this.cache = cache;
         this.clock = clock;
+        this.crawlerExecutors = crawlerExecutors;
     }
 
     @GET
@@ -216,6 +219,7 @@ public class BatchResource {
         scheduler.stop();
         queues.deleteAll();
         persistence.delete();
+        crawlerExecutors.resetExecutors();
         cache.clear();
     }
 

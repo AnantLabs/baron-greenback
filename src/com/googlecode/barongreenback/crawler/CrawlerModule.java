@@ -6,10 +6,7 @@ import com.googlecode.totallylazy.StringPrintStream;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.*;
 import com.googlecode.yadic.Container;
-
 import java.io.PrintStream;
-import java.util.concurrent.*;
-
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
 public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule, ApplicationScopedModule {
@@ -42,16 +39,7 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     @Override
     public Module addPerApplicationObjects(Container container) throws   Exception {
         container.add(CrawlerFailures.class);
-        container.addInstance(InputHandler.class, new InputHandler(executor(10, new LinkedBlockingQueue<Runnable>())));
-        container.addInstance(ProcessHandler.class, new ProcessHandler(executor(1, new LinkedBlockingQueue<Runnable>(50))));
-        container.addInstance(OutputHandler.class, new OutputHandler(executor(1, new LinkedBlockingQueue<Runnable>())));
+        container.addInstance(CrawlerExecutors.class, new CrawlerExecutors());
         return this;
-    }
-
-    private ThreadPoolExecutor executor(int threads, LinkedBlockingQueue<Runnable> workQueue) {
-        return new ThreadPoolExecutor(threads, threads,
-                0L, TimeUnit.MILLISECONDS,
-                workQueue,
-                new BlockingRetryRejectedExecutionHandler());
     }
 }
