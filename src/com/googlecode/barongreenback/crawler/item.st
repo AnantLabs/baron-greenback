@@ -1,5 +1,6 @@
 <tr class="crawler">
-    <td><a href="edit?id=$item.id$" class="update">$item.model.form.update$</a></td>
+    <td class="name">$item.model.form.name$</td>
+    <td class="update">$item.model.form.update$</td>
     <td><a href="$item.model.form.from$" class="from">$item.model.form.from$</a></td>
     <td>
         $post(url=item.jobUrl, name="crawl", id=item.id)$

@@ -5,9 +5,12 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
 
 import java.util.UUID;
 
@@ -15,10 +18,14 @@ import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.util.UUID.randomUUID;
 
 public class CrawlerRepository {
+    public static final String NAME = "name";
+    public static final String UPDATE = "update";
     private final ModelRepository modelRepository;
 
     public CrawlerRepository(final ModelRepository modelRepository) {
@@ -26,11 +33,24 @@ public class CrawlerRepository {
     }
 
     public Sequence<Pair<UUID, Model>> allCrawlerModels() {
-        return modelRepository.find(where(MODEL_TYPE, is("form")));
+        return modelRepository.find(where(MODEL_TYPE, is("form"))).map(Callables.<UUID, Model, Model>second(addName()));
     }
 
     public Option<Model> modelFor(UUID id) {
-        return modelRepository.get(id);
+        return modelRepository.get(id).map(addName());
+    }
+
+    private Callable1<? super Model, ? extends Model> addName() {
+        return new Callable1<Model, Model>() {
+            @Override
+            public Model call(Model model) throws Exception {
+                Model form = model.get("form", Model.class);
+                if (!form.contains(NAME) || Strings.isEmpty(form.get(NAME, String.class))) {
+                    form.set(NAME, form.get(UPDATE, String.class));
+                }
+                return model;
+            }
+        };
     }
 
     public Option<Model> copy(UUID id) {
@@ -45,7 +65,7 @@ public class CrawlerRepository {
             public Model call(Model crawler) throws Exception {
                 Model root = crawler.get("form", Model.class);
                 root.set("disabled", true);
-                root.set("update", "copy of " + root.get("update", String.class));
+                root.set(NAME, "copy of " + root.get(NAME, String.class));
                 return crawler;
             }
         };
@@ -72,14 +92,15 @@ public class CrawlerRepository {
     public void edit(UUID id, Model root) {
         Model form = root.get("form", Model.class);
         String from = form.get("from", String.class);
-        String update = form.get("update", String.class);
+        String update = form.get(UPDATE, String.class);
+        String name = form.get(NAME, String.class);
         String more = form.get("more", String.class);
         String checkpoint = form.get("checkpoint", String.class);
         String checkpointType = form.get("checkpointType", String.class);
         Boolean disabled = !enabled(root);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, disabled, recordDefinition.toModel()));
+        modelRepository.set(id, Forms.crawler(name, update, from, more, checkpoint, checkpointType, disabled, recordDefinition.toModel()));
     }
 
     public Boolean enabled(Model model) {

@@ -33,8 +33,8 @@ public class ConcurrentCrawler extends AbstractCrawler {
     private final BaronGreenbackRecords records;
     private final PrintStream log;
 
-    public ConcurrentCrawler(ModelRepository modelRepository, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler, PrintStream log) {
-        super(modelRepository);
+    public ConcurrentCrawler(CrawlerRepository crawlerRepository, ModelRepository modelRepository, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler, PrintStream log) {
+        super(crawlerRepository, modelRepository);
         this.checkPointHandler = checkPointHandler;
         this.httpClient = httpClient;
         this.records = records;

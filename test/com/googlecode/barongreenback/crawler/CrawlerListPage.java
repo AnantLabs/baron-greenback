@@ -7,6 +7,7 @@ import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Link;
+import org.omg.CORBA.StringHolder;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -31,20 +32,24 @@ public class CrawlerListPage {
     }
 
     public boolean contains(String name) {
-        return html.selectContent(format("descendant::a[contains(@class, 'update') and text()='%s']", name)).equals(name);
+        return html.contains(crawlerRowFor(name));
     }
 
     public CrawlerPage edit(String name) throws Exception {
-        Request request = linkFor(name).click();
+        Request request = editButtonFor(name).click();
         return new CrawlerPage(httpHandler, httpHandler.handle(request));
     }
 
-    public Link linkFor(String crawlerName) {
+    public Link editButtonFor(String crawlerName) {
         return html.link(linkTo(crawlerName));
     }
 
     private String linkTo(String crawlerName) {
-        return format("descendant::a[contains(@class, 'update') and text() = '%s']", crawlerName);
+        return format("%s/descendant::a[contains(@class, 'edit')]", crawlerRowFor(crawlerName));
+    }
+
+    private String crawlerRowFor(String crawlerName) {
+        return format("descendant::tr[@class='crawler' and td[@class='name' and text()='%s']]", crawlerName);
     }
 
     public JobsListPage crawl(String name) throws Exception {
@@ -82,7 +87,7 @@ public class CrawlerListPage {
     }
 
     private String formFor(String crawlerName, String formName) {
-        return format("descendant::tr[%s]/descendant::form[contains(@class, '%s')]", linkTo(crawlerName), formName);
+        return format("%s/descendant::form[contains(@class, '%s')]", crawlerRowFor(crawlerName), formName);
     }
 
     private String singleForm(String formName) {
@@ -98,7 +103,6 @@ public class CrawlerListPage {
     }
 
     public CrawlerListPage copy(String crawlerName) throws Exception {
-        httpHandler.handle(html.form(formFor(crawlerName, "copy")).submit(button("copy")));
-        return new CrawlerListPage(httpHandler);
+        return new CrawlerListPage(httpHandler, httpHandler.handle(html.form(formFor(crawlerName, "copy")).submit(button("copy"))));
     }
 }

@@ -124,7 +124,7 @@ public class EndToEndTest extends ApplicationTests {
 
     private String checkpointValue() throws Exception {
         CrawlerListPage crawlerListPage = new CrawlerListPage(browser);
-        final Request request = crawlerListPage.linkFor("newsfeed").click();
+        final Request request = crawlerListPage.editButtonFor("newsfeed").click();
         final CrawlerPage crawlerPage = new CrawlerPage(browser, browser.handle(request));
         return crawlerPage.checkpoint().value();
     }

@@ -34,9 +34,9 @@ public class QueuesCrawler extends AbstractCrawler {
     private final StringMappings mappings;
     private final CrawlerFailures retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final Application application, final CrawlerHttpClient crawlerHttpHandler, CrawlerExecutors crawlerExecutors, CheckPointHandler checkpointHandler,
+    public QueuesCrawler(final CrawlerRepository crawlerRepository, final ModelRepository modelRepository, final Application application, final CrawlerHttpClient crawlerHttpHandler, CrawlerExecutors crawlerExecutors, CheckPointHandler checkpointHandler,
                          StringMappings mappings, CrawlerFailures retry, PrintStream log) {
-        super(modelRepository);
+        super(crawlerRepository, modelRepository);
         this.crawlerHttpHandler = crawlerHttpHandler;
         this.crawlerExecutors = crawlerExecutors;
         this.checkpointHandler = checkpointHandler;

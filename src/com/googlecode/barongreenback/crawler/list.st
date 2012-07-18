@@ -7,7 +7,7 @@
 
 $message()$
 <table class="results zebra-striped">
-    $thead(headers=["updates", "from", "action" ])$
+    $thead(headers=["name", "updates", "from", "action" ])$
     <tbody>
     $items:item(item=it)$
     </tbody>

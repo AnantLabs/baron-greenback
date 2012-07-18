@@ -19,6 +19,18 @@ import static org.hamcrest.Matchers.not;
 
 public class CrawlerDefinitionResourceTest extends ApplicationTests {
     @Test
+    public void defaultsNameToUpdatedIfNotSupplied() throws Exception {
+        String update = "updateValue";
+
+        CrawlerPage newPage = new CrawlerPage(browser);
+        newPage.update().value(update);
+        CrawlerListPage list = newPage.save();
+        CrawlerPage edit = list.edit(update);
+        assertThat(edit.update().value(), is(update));
+        assertThat(edit.name().value(), is(update));
+    }
+
+    @Test
     public void canResetACrawler() throws Exception {
         CrawlerPage newPage = new CrawlerPage(browser);
         newPage.update().value("news");
@@ -78,7 +90,7 @@ public class CrawlerDefinitionResourceTest extends ApplicationTests {
         importPage.id().value(id);
         importPage.model().value(contentOf("crawler.json"));
         CrawlerListPage listPage = importPage.importModel();
-        assertThat(listPage.linkFor("news").value(), containsString(id));
+        assertThat(listPage.editButtonFor("news").value(), containsString(id));
     }
 
     @Test

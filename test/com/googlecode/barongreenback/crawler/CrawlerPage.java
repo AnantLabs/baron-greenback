@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class CrawlerPage {
+    public static final String NAME = "//input[@name='form.name']";
     public static final String UPDATE = "//input[@name='form.update']";
     public static final String FROM = "//input[@name='form.from']";
     public static final String MORE = "//input[@name='form.more']";
@@ -49,6 +50,10 @@ public class CrawlerPage {
         Request request = html.form("//form[contains(@class, 'crawl')]").submit("descendant::input[@type='submit' and @class='save']");
         Response response = httpHandler.handle(request);
         return new CrawlerListPage(httpHandler, response);
+    }
+
+    public Input name() {
+        return html.input(NAME);
     }
 
     public Input update() {

@@ -7,7 +7,8 @@
 
 <form class="crawl form-stacked" action="" method="POST">
 
-    $input(name="form.update", label="Update", class="update", value=form.update, placeholder="Name")$
+    $input(name="form.name", label="Name", class="name", value=form.name, placeholder="Name")$
+    $input(name="form.update", label="Update", class="update", value=form.update, placeholder="Update")$
     $input(name="form.from", label="From", class="from", value=form.from, placeholder="http://www.example.com/feed/xml")$
     $input(name="form.more", label="More", class="moreLink", value=form.more, placeholder="//link[@rel='prev-archive']/@href")$
     $input(name="form.checkpoint", label="Checkpoint Value", class="checkpoint", value=form.checkpoint, placeholder="2011-07-19T12:43:26Z")$

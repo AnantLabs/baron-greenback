@@ -21,22 +21,24 @@ import static com.googlecode.totallylazy.Uri.uri;
 import static java.util.UUID.randomUUID;
 
 public abstract class AbstractCrawler implements Crawler {
-    protected final ModelRepository modelRepository;
+    private final CrawlerRepository crawlerRepository;
+    protected final ModelRepository viewRepository;
 
-    public AbstractCrawler(ModelRepository modelRepository) {
-        this.modelRepository = modelRepository;
+    public AbstractCrawler(CrawlerRepository crawlerRepository, ModelRepository viewRepository) {
+        this.crawlerRepository = crawlerRepository;
+        this.viewRepository = viewRepository;
     }
 
     protected Model crawlerFor(UUID id) {
-        return modelRepository.get(id).get().get("form", Model.class);
+        return crawlerRepository.modelFor(id).get().get("form", Model.class);
     }
 
     protected void updateView(Model crawler, Sequence<Keyword<?>> keywords) {
-        final String update = update(crawler);
-        if (find(modelRepository, update).isEmpty()) {
-            modelRepository.set(randomUUID(), model().add(Views.ROOT, model().
-                    add("name", update).
-                    add("records", update).
+        final String name = name(crawler);
+        if (find(viewRepository, name).isEmpty()) {
+            viewRepository.set(randomUUID(), model().add(Views.ROOT, model().
+                    add("name", name).
+                    add("records", update(crawler)).
                     add("query", "").
                     add("visible", true).
                     add("priority", "").
@@ -70,6 +72,10 @@ public abstract class AbstractCrawler implements Crawler {
 
     public static String update(Model crawler) {
         return crawler.get("update", String.class);
+    }
+
+    public static String name(Model crawler) {
+        return crawler.get("name", String.class);
     }
 
     public static Uri from(Model crawler) {
