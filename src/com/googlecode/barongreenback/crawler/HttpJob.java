@@ -21,7 +21,6 @@ public class HttpJob implements StagedJob {
     protected HttpJob(Container container, Map<String, Object> context) {
         this.container = container;
         this.context = unmodifiableMap(context);
-
     }
 
     public static HttpJob job(Container container, HttpDatasource datasource, Definition destination) {
