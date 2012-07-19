@@ -1,12 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Runnables;
-import com.googlecode.totallylazy.Sequences;
 
 import java.io.Closeable;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -18,6 +15,36 @@ public class CrawlerExecutors implements Closeable {
     private InputHandler inputHandler;
     private ProcessHandler processHandler;
     private OutputHandler outputHandler;
+    private Integer inputHandlerThreads = 10;
+    private Integer processHandlerThreads = 1;
+    private Integer outputHandlerThreads = 1;
+    private Integer inputHandlerCapacity = 0;
+    private Integer processHandlerCapacity = 50;
+    private Integer outputHandlerCapacity = 0;
+
+    public Integer getInputHandlerThreads() {
+        return inputHandlerThreads;
+    }
+
+    public Integer getProcessHandlerThreads() {
+        return processHandlerThreads;
+    }
+
+    public Integer getOutputHandlerThreads() {
+        return outputHandlerThreads;
+    }
+
+    public Integer getInputHandlerCapacity() {
+        return inputHandlerCapacity;
+    }
+
+    public Integer getProcessHandlerCapacity() {
+        return processHandlerCapacity;
+    }
+
+    public Integer getOutputHandlerCapacity() {
+        return outputHandlerCapacity;
+    }
 
     public CrawlerExecutors() {
         initialise();
@@ -35,16 +62,48 @@ public class CrawlerExecutors implements Closeable {
         return outputHandler;
     }
 
+    public void setInputHandlerThreads(Integer inputHandlerThreads) {
+        this.inputHandlerThreads = inputHandlerThreads;
+        resetExecutors();
+    }
+
+    public void setProcessHandlerThreads(Integer processHandlerThreads) {
+        this.processHandlerThreads = processHandlerThreads;
+        resetExecutors();
+    }
+
+    public void setOutputHandlerThreads(Integer outputHandlerThreads) {
+        this.outputHandlerThreads = outputHandlerThreads;
+        resetExecutors();
+    }
+
+    public void setInputHandlerCapacity(Integer inputHandlerCapacity) {
+        this.inputHandlerCapacity = inputHandlerCapacity;
+        resetExecutors();
+    }
+
+    public void setProcessHandlerCapacity(Integer processHandlerCapacity) {
+        this.processHandlerCapacity = processHandlerCapacity;
+        resetExecutors();
+    }
+
+    public void setOutputHandlerCapacity(Integer outputHandlerCapacity) {
+        this.outputHandlerCapacity = outputHandlerCapacity;
+        resetExecutors();
+    }
+
     private void initialise() {
-        this.inputHandler = createInputHandler();
-        this.processHandler = createProcessHandler();
-        this.outputHandler = createOutputHandler();
+        this.inputHandler = createHandler(inputHandlerThreads, inputHandlerCapacity);
+        this.processHandler = createProcessHandler(processHandlerThreads, processHandlerCapacity);
+        this.outputHandler = createOutputHandler(outputHandlerThreads, outputHandlerCapacity);
     }
 
     public void resetExecutors() {
         close();
         initialise();
     }
+
+
 
     @Override
     public void close() {
@@ -58,16 +117,16 @@ public class CrawlerExecutors implements Closeable {
                 new BlockingRetryRejectedExecutionHandler());
     }
 
-    private OutputHandler createOutputHandler() {
-        return new OutputHandler(createExecutor(1, new LinkedBlockingQueue<Runnable>()));
+    private OutputHandler createOutputHandler(int threads, int capacity) {
+        return new OutputHandler(createExecutor(threads, new LinkedBlockingQueue<Runnable>()));
     }
 
-    private ProcessHandler createProcessHandler() {
-        return new ProcessHandler(createExecutor(1, new LinkedBlockingQueue<Runnable>(50)));
+    private ProcessHandler createProcessHandler(int threads, int capacity) {
+        return new ProcessHandler(createExecutor(threads, new LinkedBlockingQueue<Runnable>(capacity)));
     }
 
-    private InputHandler createInputHandler() {
-        return new InputHandler(createExecutor(10, new LinkedBlockingQueue<Runnable>()));
+    public InputHandler createHandler(int threads, int capacity) {
+        return new InputHandler(createExecutor(threads, new LinkedBlockingQueue<Runnable>()));
     }
 
     private Callable1<ExecutorService, List<Runnable>> shutdownNow() {
