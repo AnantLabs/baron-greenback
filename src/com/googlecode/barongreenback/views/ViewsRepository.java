@@ -50,7 +50,7 @@ public class ViewsRepository {
 
     public void ensureViewForCrawlerExists(Model crawler, Sequence<Keyword<?>> keywords) {
         final String name = AbstractCrawler.name(crawler);
-        if (viewForName(name).isEmpty()) {
+        if (viewForName(name).isEmpty() && viewForRecords(AbstractCrawler.update(crawler)).isEmpty()) {
             set(randomUUID(), viewModel(keywords, name, AbstractCrawler.update(crawler), "", true, ""));
         }
     }
@@ -90,8 +90,12 @@ public class ViewsRepository {
     }
 
     public static Option<Model> find(final ModelRepository modelRepository, final String name) {
+        return find(modelRepository, where(valueFor("name", String.class), is(name)));
+    }
+
+    private static Option<Model> find(ModelRepository modelRepository, Predicate<Second<Model>> predicate) {
         return modelRepository.find(Predicates.where(MODEL_TYPE, is(ROOT))).
-                find(where(valueFor("name", String.class), is(name))).
+                find(predicate).
                 map(Callables.<Model>second());
     }
 
@@ -163,6 +167,10 @@ public class ViewsRepository {
 
     public Option<Model> viewForName(String name) {
         return find(modelRepository, name);
+    }
+
+    private Option<Model> viewForRecords(String update) {
+        return find(modelRepository, where(valueFor("records", String.class), is(update)));
     }
 
     public void set(UUID uuid, Model model) {
