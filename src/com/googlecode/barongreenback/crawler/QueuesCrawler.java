@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
@@ -39,18 +38,16 @@ public class QueuesCrawler extends AbstractCrawler {
         Definition destination = destinationDefinition(crawler);
         checkOnlyOne(destination);
 
-        updateView(crawler, destination.fields());
-
         HttpDatasource datasource = HttpDatasource.datasource(from(crawler), source);
 
-        Container crawlContainer = crawlContainer(id, crawler);
+        Container crawlerScope = crawlerScope(id, crawler);
 
-        return crawlContainer.get(StagedJobExecutor.class).crawlAndWait(
-                masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
+        return crawlerScope.get(StagedJobExecutor.class).crawlAndWait(
+                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
     }
 
-    private Container crawlContainer(UUID id, Model crawler) {
-        return CrawlerScope.crawlContainer(requestContainer, log, crawlerHttpHandler, new CheckpointUpdater(checkpointHandler, id, crawler));
+    private Container crawlerScope(UUID id, Model crawler) {
+        return CrawlerScope.crawlerScope(requestContainer, log, crawlerHttpHandler, new CheckpointUpdater(checkpointHandler, id, crawler));
    }
 
     private Sequence<Keyword<?>> checkOnlyOne(Definition definition) {

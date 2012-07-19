@@ -23,10 +23,10 @@ public class StagedJobExecutor {
     private final OutputHandler outputHandler;
     private final Application application;
     private final CountLatch latch = new CountLatch();
-    private final Container container;
+    private final Container crawlerScope;
 
-    public StagedJobExecutor(CrawlerExecutors executors, Application application, Container crawlContainer) {
-        this.container = crawlContainer;
+    public StagedJobExecutor(CrawlerExecutors executors, Application application, Container crawlerScope) {
+        this.crawlerScope = crawlerScope;
         this.inputHandler = executors.inputHandler();
         this.processHandler = executors.processHandler();
         this.outputHandler = executors.outputHandler();
@@ -36,18 +36,18 @@ public class StagedJobExecutor {
     public int crawlAndWait(StagedJob job) throws InterruptedException {
         crawl(job);
         latch.await();
-        return container.get(AtomicInteger.class).get();
+        return crawlerScope.get(AtomicInteger.class).get();
     }
 
     public Future<?> crawl(StagedJob job) throws InterruptedException {
-        return submit(inputHandler, HttpReader.getInput(job, container).then(
-                submit(processHandler, processJobs(job.process(container)).then(
-                        submit(outputHandler, DataWriter.write(application, job, container))))));
+        return submit(inputHandler, HttpReader.getInput(job, crawlerScope).then(
+                submit(processHandler, processJobs(job.process(crawlerScope)).then(
+                        submit(outputHandler, DataWriter.write(application, job, crawlerScope))))));
     }
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable function) {
         latch.countUp();
-        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function), container.get(PrintStream.class)));
+        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class)));
     }
 
     private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable) {

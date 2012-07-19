@@ -14,7 +14,7 @@ public interface StagedJob {
 
     Definition destination();
 
-    Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(Container container);
+    Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(Container crawlerScope);
 
     public static class functions {
         public static Callable1<StagedJob, HttpDatasource> datasource() {

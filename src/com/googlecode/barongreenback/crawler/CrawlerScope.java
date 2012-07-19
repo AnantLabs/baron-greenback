@@ -32,7 +32,7 @@ public class CrawlerScope implements Container {
         Containers.selfRegister(container);
     }
 
-    public static CrawlerScope crawlContainer(Container requestContainer, PrintStream log, CrawlerHttpClient crawlerHttpHandler, CheckpointUpdater checkpointUpdater) {
+    public static CrawlerScope crawlerScope(Container requestContainer, PrintStream log, CrawlerHttpClient crawlerHttpHandler, CheckpointUpdater checkpointUpdater) {
         return new CrawlerScope(requestContainer, log, crawlerHttpHandler, checkpointUpdater);
     }
 
