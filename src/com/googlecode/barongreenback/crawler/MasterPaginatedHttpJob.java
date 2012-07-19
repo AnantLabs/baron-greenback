@@ -24,8 +24,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
     }
 
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(Container crawlContainer, HttpDatasource datasource,
-                                                                Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("datasource", datasource);
         context.put("destination", destination);
@@ -38,17 +37,17 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         return new MasterPaginatedHttpJob(context, mappings);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container container) {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
                 Option<Document> document = loadDocument(response);
 
                 for (Document doc : document) {
-                    container.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
+                    crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
                 }
 
-                return processDocument(document, container);
+                return processDocument(document, crawlerScope);
             }
         };
     }

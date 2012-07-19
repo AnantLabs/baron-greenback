@@ -39,11 +39,11 @@ public class PaginatedHttpJob extends HttpJob {
         return new PaginatedHttpJob(context, mappings);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container container) {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                return processDocument(loadDocument(response), container);
+                return processDocument(loadDocument(response), crawlerScope);
             }
         };
     }

@@ -10,10 +10,10 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 
 public class HttpReader {
-    public static Function<Response> getInput(StagedJob job, Container crawlContainer) {
+    public static Function<Response> getInput(StagedJob job, Container crawlerScope) {
         Uri uri = job.datasource().uri();
-        HttpClient httpClient = crawlContainer.get(HttpClient.class);
-        FailureHandler failureHandler = crawlContainer.get(FailureHandler.class);
+        HttpClient httpClient = crawlerScope.get(HttpClient.class);
+        FailureHandler failureHandler = crawlerScope.get(FailureHandler.class);
         return failureHandler.captureFailures(asFunction(httpClient), job).deferApply(get(uri).build());
     }
 }
