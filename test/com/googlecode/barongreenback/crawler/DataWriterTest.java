@@ -20,7 +20,7 @@ public class DataWriterTest {
     @Test
     public void shouldWriteUniqueDataToRecords() throws Exception {
         Records records = new MemoryRecords();
-        Keyword<String> name = Keywords.keyword("name", String.class).metadata(record().set(Keywords.UNIQUE, true));
+        Keyword<String> name = Keywords.keyword("name", String.class).setMetadata(Keywords.UNIQUE, true);
         Definition children = definition("children", name);
         Record expected = record().set(name, "Dan");
         DataWriter dataWriter = new DataWriter(records, new StringPrintStream());

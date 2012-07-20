@@ -81,7 +81,7 @@ public class SubFeeder implements Feeder<Uri> {
     static Record copyMissingFieldsFromParent(Record parentRecord, Record subFeedRecord) {
         for (Keyword<Object> keyword : parentRecord.keywords().<Keyword<Object>>unsafeCast()) {
             if(!subFeedRecord.keywords().contains(keyword)){
-                subFeedRecord.set(keyword, parentRecord.get(keyword));
+                subFeedRecord = subFeedRecord.set(keyword, parentRecord.get(keyword));
             }
         }
         return subFeedRecord;

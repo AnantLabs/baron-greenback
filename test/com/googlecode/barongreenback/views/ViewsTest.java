@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Record.constructors.record;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -27,7 +28,8 @@ public class ViewsTest {
 
     @Test
     public void canConvertKeyword() throws Exception{
-        Record metadata = Record.constructors.record().set(ViewsRepository.GROUP, "someGroup").
+        Record metadata = record().
+                set(ViewsRepository.GROUP, "someGroup").
                 set(ViewsRepository.VISIBLE, false).
                 set(Keywords.UNIQUE, true);
         Model model = model().add(ViewsRepository.ROOT, model().

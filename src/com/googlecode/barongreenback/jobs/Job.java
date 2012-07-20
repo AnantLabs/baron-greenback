@@ -20,9 +20,9 @@ public class Job {
     public static final Keyword<Date> COMPLETED = keyword("completed", Date.class);
     public static final Keyword<Boolean> RUNNING = keyword("running", Boolean.class);
 
-    private final Record record;
+    private Record record;
 
-    public Job(Record record) {
+    private Job(Record record) {
         this.record = record;
     }
 
@@ -31,38 +31,36 @@ public class Job {
     }
 
     public Job interval(Long interval) {
-        record.set(INTERVAL, interval);
+        return set(INTERVAL, interval);
+    }
+
+    private <T> Job set(Keyword<T> keyword, T value) {
+        record = record.set(keyword, value);
         return this;
     }
 
     public Job request(String request) {
-        record.set(REQUEST, request);
-        return this;
+        return set(REQUEST, request);
     }
 
     public Job response(String response) {
-        record.set(RESPONSE, response);
-        return this;
+        return set(RESPONSE, response);
     }
 
     public Job started(Date started) {
-        record.set(STARTED, started);
-        return this;
+        return set(STARTED, started);
     }
 
     public Job completed(Date completed) {
-        record.set(COMPLETED, completed);
-        return this;
+        return set(COMPLETED, completed);
     }
 
     public Job running(boolean running) {
-        record.set(RUNNING, running);
-        return this;
+        return set(RUNNING, running);
     }
 
     public Job duration(Long duration) {
-        record.set(DURATION, duration);
-        return this;
+        return set(DURATION, duration);
     }
 
     public Record toRecord() {

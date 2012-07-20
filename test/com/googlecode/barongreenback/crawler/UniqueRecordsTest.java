@@ -7,6 +7,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import org.junit.Test;
 
+import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Uri.uri;
@@ -14,9 +15,9 @@ import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class UniqueRecordsTest {
-    private final Keyword<Integer> ID = Keywords.keyword("ID", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
-    private final Keyword<Integer> SOME_OTHER_KEY = Keywords.keyword("SOME_OTHER_KEY", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
-    private final Keyword<Uri> URI = Keywords.keyword("URI", Uri.class).metadata(record().set(Keywords.UNIQUE, true));
+    private final Keyword<Integer> ID = keyword("ID", Integer.class).setMetadata(Keywords.UNIQUE, true);
+    private final Keyword<Integer> SOME_OTHER_KEY = keyword("SOME_OTHER_KEY", Integer.class).setMetadata(Keywords.UNIQUE, true);
+    private final Keyword<Uri> URI = keyword("URI", Uri.class).setMetadata(Keywords.UNIQUE, true);
 
     @Test
     public void removesRecordsWithSameUniqueField() throws Exception{

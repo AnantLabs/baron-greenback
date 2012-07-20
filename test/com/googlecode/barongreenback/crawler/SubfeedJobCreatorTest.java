@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keywords.UNIQUE;
 import static com.googlecode.lazyrecords.Keywords.keyword;
@@ -25,13 +26,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SubfeedJobCreatorTest {
     public static final Keyword<String> PERSON_NAME = keyword("person/name", String.class);
-    public static final Keyword<Uri> LINK = Keywords.keyword("link", Uri.class).metadata(
-            record().
-                    set(RecordDefinition.RECORD_DEFINITION, new RecordDefinition(definition("/subfeed", PERSON_NAME))).
-                    set(UNIQUE, true));
+    public static final Keyword<Uri> LINK = Keywords.keyword("link", Uri.class).
+            setMetadata(RECORD_DEFINITION, new RecordDefinition(definition("/subfeed", PERSON_NAME))).
+            setMetadata(UNIQUE, true);
     public static final Definition SOME_DESTINATION = Definition.constructors.definition("foo", Sequences.<Keyword<?>>empty());
     public static final Uri URI = Uri.uri("http://hello.com/");
-    public static final Keyword<String> PREV_UNIQUE = Keywords.keyword("foo", String.class).metadata(record().set(UNIQUE, true));
+    public static final Keyword<String> PREV_UNIQUE = Keywords.keyword("foo", String.class).setMetadata(UNIQUE, true);
 
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
