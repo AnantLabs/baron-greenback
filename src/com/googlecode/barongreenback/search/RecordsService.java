@@ -85,8 +85,12 @@ public class RecordsService {
         Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders);
         if(invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
 
+        return right(getRecords(view, invalidQueryOrPredicate.right()));
+    }
+
+    public Sequence<Record> getRecords(Model view, Predicate<Record> predicate) {
         Definition viewDefinition = Definition.constructors.definition(viewName(view), headers(view));
-        return right(records.get(viewDefinition).filter(invalidQueryOrPredicate.right()));
+        return records.get(viewDefinition).filter(predicate);
     }
 
     public Model view(String view) {
