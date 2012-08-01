@@ -12,6 +12,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.GenericType;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
@@ -45,6 +46,8 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.descending;
+import static com.googlecode.totallylazy.GenericType.functions.forClass;
+import static com.googlecode.totallylazy.Predicates.classAssignableTo;
 import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -111,25 +114,7 @@ public class SearchResource {
     }
 
     private Keyword<? extends Comparable> findFirstComparable(Definition definition) {
-        return cast(definition.fields().find(Predicates.where(forClass(), isAssignableTo(Comparable.class))).get());
-    }
-
-    private static Predicate<Class<?>> isAssignableTo(final Class<?> aClass) {
-        return new Predicate<Class<?>>() {
-            @Override
-            public boolean matches(Class<?> other) {
-                return aClass.isAssignableFrom(other);
-            }
-        };
-    }
-
-    private static Callable1<Keyword<?>, Class<?>> forClass() {
-        return new Callable1<Keyword<?>, Class<?>>() {
-            @Override
-            public Class<?> call(Keyword<?> keyword) throws Exception {
-                return keyword.forClass();
-            }
-        };
+        return cast(definition.fields().find(Predicates.where(forClass(), classAssignableTo(Comparable.class))).get());
     }
 
     @GET
