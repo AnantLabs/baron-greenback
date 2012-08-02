@@ -14,11 +14,11 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.Requests.query;
 
 public class RequestPager implements Pager {
-    private static final String DEFAULT_ROWS_PER_PAGE = "20";
+    public static final String DEFAULT_ROWS_PER_PAGE = "20";
     private static final String DEFAULT_PAGE = "1";
 
     private int currentPage;
-    private String numberOfRowsPerPage;
+    private final String numberOfRowsPerPage;
     private int totalRows;
     private Request request;
 
@@ -27,14 +27,27 @@ public class RequestPager implements Pager {
         this.request = request;
         final QueryParameters queryParameters = query(request);
 
-        currentPage = Integer.parseInt(Option.option(queryParameters.getValue(CURRENT_PAGE_PARAM)).getOrElse(DEFAULT_PAGE));
-        numberOfRowsPerPage = Option.option(queryParameters.getValue(ROWS_PER_PAGE_PARAM)).getOrElse(DEFAULT_ROWS_PER_PAGE);
+        currentPage(Integer.parseInt(Option.option(queryParameters.getValue(CURRENT_PAGE_PARAM)).getOrElse(DEFAULT_PAGE)));
+        numberOfRowsPerPage = checkRowsPerPage(Option.option(queryParameters.getValue(ROWS_PER_PAGE_PARAM)).getOrElse(DEFAULT_ROWS_PER_PAGE));
+    }
+
+    private String checkRowsPerPage(String value) {
+        try {
+            return Integer.valueOf(value) < 1 ? DEFAULT_ROWS_PER_PAGE : value;
+        } catch (NumberFormatException e) {
+            return value;
+        }
+    }
+
+    private RequestPager currentPage(int page) {
+        currentPage = page < 1 ? 1 : page;
+        return this;
     }
 
     public <T> Sequence<T> paginate(Sequence<T> sequence) {
         totalRows = sequence.size();
         if (isShowingAllPages()) {
-            currentPage = 1;
+            currentPage(1);
             return sequence;
         }
 
@@ -56,7 +69,7 @@ public class RequestPager implements Pager {
     }
 
     public String getRowsPerPage() {
-        return String.valueOf(numberOfRowsPerPage);
+        return numberOfRowsPerPage;
     }
 
     public int getTotalRows() {

@@ -23,10 +23,26 @@ public class RequestPagerTest {
     }
 
     @Test
+    public void ifCurrentPageIsLessThanOneDefaultToOne() throws Exception {
+        Request request = requestForCurrentPageAndRows(0, 25).build();
+        Pager pager = new RequestPager(request);
+        
+        assertThat(pager.getCurrentPage(), is(1));
+    }
+
+    @Test
+    public void ifNumberOfRowsIsLessThanOneUseDefaultValue() throws Exception {
+        Request request = requestForCurrentPageAndRows(1, 0).build();
+        Pager pager = new RequestPager(request);
+
+        assertThat(pager.getRowsPerPage(), is(RequestPager.DEFAULT_ROWS_PER_PAGE));
+    }
+
+    @Test
     public void getsCurrentPageAndRowsPerPageFromRequest() throws Exception {
         Request request = requestForCurrentPageAndRows(30, 25).build();
         Pager pager = new RequestPager(request);
-        
+
         assertThat(pager.getCurrentPage(), is(30));
         assertThat(pager.getRowsPerPage(), is("25"));
     }
