@@ -12,7 +12,6 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.GenericType;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
@@ -88,16 +87,22 @@ public class SearchResource {
     @GET
     @Path("list")
     public Model list(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
-        Uri uri = redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query)));
+        final Either<String, Sequence<Record>> errorOrResults = recordsService.findFromView(viewName, query);
+        return results(viewName, query, errorOrResults);
+    }
+
+    @GET
+    @Path("all")
+    public Model all(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
-        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query)).add("csvUrl", uri.toString());
+        return results(viewName, query, errorOrResults);
     }
 
     @GET
     @Produces(MediaType.TEXT_CSV)
     @Path("csv")
     public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
-        final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
+        final Either<String, Sequence<Record>> errorOrResults = recordsService.findFromView(viewName, query);
         final Definition definition = recordsService.definition(recordsService.view(viewName));
 
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
@@ -111,6 +116,11 @@ public class SearchResource {
                         writeTo(definition, result, writer);
                     }
                 }).build();
+    }
+
+    private Model results(String viewName, String query, Either<String, Sequence<Record>> errorOrResults) {
+        Uri uri = redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query)));
+        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query)).add("csvUrl", uri.toString());
     }
 
     private Keyword<? extends Comparable> findFirstComparable(Definition definition) {
