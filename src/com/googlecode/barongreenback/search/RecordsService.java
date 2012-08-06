@@ -42,7 +42,7 @@ public class RecordsService {
 
     public void delete(String viewName, String query) {
         Model view = view(viewName);
-        Predicate<Record> predicate = predicateBuilder.build(view, query, visibleHeaders(view)).right();
+        Predicate<Record> predicate = predicateBuilder.build(query, visibleHeaders(view)).right();
         records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
@@ -73,7 +73,15 @@ public class RecordsService {
         return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
-    public Either<String, Sequence<Record>> findAll(final String viewName, final String query) {
+    public Either<String,Sequence<Record>> findAll(String viewName, String query) {
+        Option<Model> optionalView = findView( viewName);
+        if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
+
+        Model view = optionalView.get();
+        return getRecordsWithQuery(view, query, visibleHeaders(view));
+    }
+
+    public Either<String, Sequence<Record>> findFromView(final String viewName, final String query) {
         Option<Model> optionalView = findView( viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
@@ -81,8 +89,20 @@ public class RecordsService {
         return getRecords(view, query, visibleHeaders(headers(view)));
     }
 
+    private static String prefix(Model view, final String query) {
+        return sequence(queryFrom(view)).add(query).toString(" ");
+    }
+
+    private static String queryFrom(Model model) {
+        return model.get("view", Model.class).get("query", String.class);
+    }
+
     private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {
-        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders);
+        return getRecordsWithQuery(view, prefix(view, query), visibleHeaders);
+    }
+
+    private Either<String, Sequence<Record>> getRecordsWithQuery(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(query, visibleHeaders);
         if(invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
 
         return right(getRecords(view, invalidQueryOrPredicate.right()));
@@ -113,10 +133,10 @@ public class RecordsService {
         return visibleHeaders(headers(view));
     }
 
+
     private static Sequence<Keyword<?>> visibleHeaders(Sequence<Keyword<?>> headers) {
         return headers.filter(where(metadata(ViewsRepository.VISIBLE), is(notNullValue(Boolean.class).and(is(true)))));
     }
-
 
     public static Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));
@@ -130,5 +150,4 @@ public class RecordsService {
             }
         };
     }
-
 }
