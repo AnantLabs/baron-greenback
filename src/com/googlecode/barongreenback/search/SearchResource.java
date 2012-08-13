@@ -114,7 +114,7 @@ public class SearchResource {
                 entity(new StreamingWriter() {
                     @Override
                     public void write(Writer writer) throws IOException {
-                        CsvWriter.writeTo(result, writer, recordsService.visibleHeaders(view));
+                        CsvWriter.writeTo(result.iterator(), writer, recordsService.visibleHeaders(view));
                     }
                 }).build();
     }
