@@ -35,6 +35,7 @@ import static java.lang.Boolean.TRUE;
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
     public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
+    public static final Keyword<String> PRIORITY = keyword("priority", String.class);
     public static final Predicate<Keyword<?>> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.UNIQUE), is(notNullValue())), where(metadata(Keywords.UNIQUE), is(true)));
     private final Definition definition;
 
@@ -94,9 +95,14 @@ public class RecordDefinition {
     private static Callable1<Keyword, Model> asKeywordDefinition() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
-                return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), subfeed(keyword), recordDefinition(keyword), checkpoint(keyword));
+                return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword),
+                        visible(keyword), subfeed(keyword), recordDefinition(keyword), checkpoint(keyword), priority(keyword));
             }
         };
+    }
+
+    public static String priority(Keyword keyword) {
+        return keyword.metadata().get(PRIORITY);
     }
 
     public static Option<Model> recordDefinition(Keyword keyword) {
@@ -153,17 +159,18 @@ public class RecordDefinition {
         return model().add("name", recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
-    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, boolean subfeed, Option<Model> recordDefinition, boolean checkpoint) {
+    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, boolean subfeed, Option<Model> recordDefinition, boolean checkpoint, String priority) {
         return model().
                 add("name", name).
                 add("alias", alias).
-                add("group", group).
+                add(ViewsRepository.GROUP.name(), group).
                 add("type", type).
-                add("unique", unique).
-                add("visible", visible).
-                add("subfeed", subfeed).
+                add(Keywords.UNIQUE.name(), unique).
+                add(ViewsRepository.VISIBLE.name(), visible).
+                add(RecordDefinition.SUBFEED.name(), subfeed).
                 add("record", subfeed ? recordDefinition.getOrNull() : null).
-                add("checkpoint", checkpoint);
+                add(CompositeCrawler.CHECKPOINT.name(), checkpoint).
+                add(PRIORITY.name(), priority);
     }
 
     public static RecordDefinition convert(Model model) {
@@ -208,11 +215,12 @@ public class RecordDefinition {
                     keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
                 }
                 return keyword.metadata(Record.constructors.record().
-                        set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
-                        set(ViewsRepository.VISIBLE, model.get("visible", Boolean.class)).
-                        set(ViewsRepository.GROUP, model.get("group", String.class)).
-                        set(CompositeCrawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
-                        set(RecordDefinition.SUBFEED, model.get("subfeed", Boolean.class)).
+                        set(Keywords.UNIQUE, model.get(Keywords.UNIQUE.name(), Keywords.UNIQUE.forClass())).
+                        set(ViewsRepository.VISIBLE, model.get(ViewsRepository.VISIBLE.name(), ViewsRepository.VISIBLE.forClass())).
+                        set(ViewsRepository.GROUP, model.get(ViewsRepository.GROUP.name(), ViewsRepository.GROUP.forClass())).
+                        set(CompositeCrawler.CHECKPOINT, model.get(CompositeCrawler.CHECKPOINT.name(), CompositeCrawler.CHECKPOINT.forClass())).
+                        set(RecordDefinition.SUBFEED, model.get(RecordDefinition.SUBFEED.name(), RecordDefinition.SUBFEED.forClass())).
+                        set(RecordDefinition.PRIORITY, model.get(RecordDefinition.PRIORITY.name(), RecordDefinition.PRIORITY.forClass())).
                         set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }
         };

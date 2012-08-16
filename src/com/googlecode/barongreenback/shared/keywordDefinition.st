@@ -11,7 +11,7 @@
     $checkbox(id=prefix + "subfeed", name=prefix + "subfeed", class="subfeed", label="Subfeed", checked=keyword.subfeed)$
     $checkbox(id=prefix + "checkpoint", name=prefix + "checkpoint", class="checkpoint", label="Checkpoint", checked=keyword.checkpoint)$
     $input(id=prefix + "subfeedPrefix", name=prefix + "subfeedPrefix", class="subfeedPrefix", value=prefix + "record.", type="hidden")$
-
+    $input(id=prefix + "priority", name=prefix + "priority", class="priority", label="Priority", value=keyword.priority)$
     <div class="subrecordDefinition">
     $if(keyword.record)$
         $recordDefinition(title="Fields", prefix=prefix + "record.", record=keyword.record)$

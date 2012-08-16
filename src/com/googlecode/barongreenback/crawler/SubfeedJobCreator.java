@@ -5,6 +5,7 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
@@ -13,10 +14,10 @@ import com.googlecode.totallylazy.Uri;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMerge;
 import static com.googlecode.barongreenback.crawler.StagedJob.functions.datasource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keywords.metadata;
-import static com.googlecode.lazyrecords.Record.functions.merge;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -37,8 +38,9 @@ public class SubfeedJobCreator {
     }
 
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(Sequence<Record> records) {
-        return Pair.pair(records.map(merge(crawledRecord)), createSubfeedJobs(records));
+        return Pair.pair(records.map(priorityMerge(crawledRecord)), createSubfeedJobs(records));
     }
+
 
     private Sequence<StagedJob> createSubfeedJobs(Sequence<Record> records) {
         return records.flatMap(subfeedsKeywords()).
@@ -68,7 +70,7 @@ public class SubfeedJobCreator {
 
     private HttpJob job(Pair<Keyword<?>, Object> subfeedField, Record record) {
         Uri uri = Uri.uri(subfeedField.second().toString());
-        Record newRecord = one(record).map(merge(crawledRecord)).head();
+        Record newRecord = one(record).map(priorityMerge(crawledRecord)).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
         return HttpJob.httpJob(crawlerId, newRecord, HttpDatasource.httpDatasource(uri, subfeedDefinition), destination, visited);
