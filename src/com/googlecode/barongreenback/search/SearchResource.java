@@ -51,7 +51,7 @@ import java.util.Map;
 import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;

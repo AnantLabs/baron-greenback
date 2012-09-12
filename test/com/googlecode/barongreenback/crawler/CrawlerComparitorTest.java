@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,7 +44,7 @@ public class CrawlerComparitorTest extends ApplicationTests {
     }
 
     public String extractName(String definition) {
-        return Model.parse(definition).get("form", Model.class).get("update", String.class);
+        return parse(definition).get("form", Model.class).get("update", String.class);
     }
 
     public void deleteAll() throws Exception {

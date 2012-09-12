@@ -20,7 +20,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -46,7 +46,7 @@ public class ActionsResource {
 
         Sequence<Model> actions = (AdvancedMode.Enable.equals(mode)) ? normalActions.join(advancedActions) : normalActions;
 
-        return Model.model().add("actions", actions.toList());
+        return model().add("actions", actions.toList());
     }
 
     private Model action(final Uri uri, final String name, final String method) {
@@ -71,6 +71,4 @@ public class ActionsResource {
         delete(viewName, sequence(id).map(Strings.format(idName + ":%s")).toString(" OR "));
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
-
-
 }
