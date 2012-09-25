@@ -9,6 +9,7 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.Xml;
 import com.googlecode.utterlyidle.Response;
@@ -79,7 +80,8 @@ public class PaginatedHttpJob extends HttpJob {
         Sequence<Record> events = transformData(document, datasource().source());
         Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
         Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(destination(), visited(), crawlerId(), record()).process(filtered);
-        return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
+        Sequence<StagedJob> sequence = Sequences.<StagedJob>sequence(nextPageJob(document));
+        return Pair.pair(pair.first(), sequence.join(pair.second()));
     }
 
     public Option<PaginatedHttpJob> nextPageJob(Option<Document> document) {
