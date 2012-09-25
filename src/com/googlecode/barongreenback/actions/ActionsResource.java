@@ -66,7 +66,7 @@ public class ActionsResource {
     @GET
     @Path("delete")
     public Model deleteModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query))), "delete", "POST");
+        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query, Sequences.<String>empty()))), "delete", "POST");
     }
 
 
@@ -82,7 +82,7 @@ public class ActionsResource {
     @Path("delete")
     public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query, @FormParam("id") Iterable<String> id) {
         String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
-        delete(viewName, sequence(id).map(Strings.format(idName + ":%s")).toString(" OR "));
+        delete(viewName, sequence(id).map(Strings.replace("\"", "\\\"")).map(Strings.format(idName + ":\"%s\"")).toString(" OR "));
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
 }
