@@ -14,11 +14,9 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 
@@ -27,8 +25,8 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         super(context);
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
-        return new MasterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, mappings, Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>())));
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, VisitedFactory visitedFactory) {
+        return new MasterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, mappings, visitedFactory.value()));
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
@@ -39,7 +37,8 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
                 Option<Document> document = loadDocument(response);
 
-                for (Document doc : document) crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(StringMappings.class))));
+                for (Document doc : document)
+                    crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(StringMappings.class))));
 
                 return processDocument(document);
             }

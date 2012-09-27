@@ -5,12 +5,13 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.predicates.LogicalPredicate;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,7 +19,6 @@ import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMerge;
 import static com.googlecode.barongreenback.crawler.StagedJob.functions.datasource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keywords.metadata;
-import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -45,8 +45,17 @@ public class SubfeedJobCreator {
     private Sequence<StagedJob> createSubfeedJobs(Sequence<Record> records) {
         return records.flatMap(subfeedsKeywords()).
                 unique(datasource()).
-                filter(where(datasource(), not(in(visited)))).
+                filter(where(datasource(), not(this.in(visited)))).
                 realise();
+    }
+
+    private <T> LogicalPredicate<T> in(final Collection<T> collection) {
+        return new LogicalPredicate<T>() {
+            @Override
+            public boolean matches(T other) {
+                return collection.contains(other);
+            }
+        };
     }
 
     private Callable1<Record, Sequence<StagedJob>> subfeedsKeywords() {

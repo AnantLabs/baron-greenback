@@ -4,7 +4,7 @@ import com.googlecode.barongreenback.crawler.AbstractCrawler;
 import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
-import com.googlecode.barongreenback.crawler.HttpDatasource;
+import com.googlecode.barongreenback.crawler.VisitedFactory;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.persistence.ModelMapping;
 import com.googlecode.barongreenback.shared.ModelRepository;
@@ -23,18 +23,14 @@ import com.googlecode.yadic.SimpleContainer;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ENTRIES;
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.USER;
 import static com.googlecode.barongreenback.crawler.HttpDatasource.httpDatasource;
 import static com.googlecode.barongreenback.crawler.HttpJob.httpJob;
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
+import static com.googlecode.barongreenback.crawler.VisitedFactory.visitedFactory;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Sets.set;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -42,9 +38,6 @@ import static org.junit.Assert.assertThat;
 public class FailuresTest {
     private static final Record record = Record.constructors.record().set(Keywords.keyword("title", String.class), "Man eats dog");
     private static final Container scope = testScope();
-    private static final Set<HttpDatasource> visited = set(
-            httpDatasource(uri("/road/to/nowhere"), ENTRIES),
-            httpDatasource(uri("/road/to/somewhere"), USER));
 
     private static final UUID crawlerId = UUID.randomUUID();
     private Definition source;
@@ -61,17 +54,17 @@ public class FailuresTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, visited), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, visitedFactory().value()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), new HashSet<HttpDatasource>()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory().value()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory()), "Bigtime failures"));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {
@@ -81,7 +74,7 @@ public class FailuresTest {
         Option<Failure> right = failures.get(failureId);
         Option<Failure> left = some(failure);
 
-        assertThat(right, is(left));
+        assertThat(left, is(right));
     }
 
     public static Container testScope() {
@@ -97,6 +90,7 @@ public class FailuresTest {
         scope.add(PaginatedJobFailureMarshaller.class);
         scope.add(MasterPaginatedJobFailureMarshaller.class);
         scope.add(Failures.class);
+        scope.add(VisitedFactory.class);
         Containers.selfRegister(scope);
         return scope;
     }

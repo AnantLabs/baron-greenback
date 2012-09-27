@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.crawler.AbstractCrawler;
 import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.HttpDatasource;
+import com.googlecode.barongreenback.crawler.VisitedFactory;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
@@ -14,9 +15,7 @@ import com.googlecode.totallylazy.Function2;
 import com.googlecode.totallylazy.LazyException;
 import com.googlecode.totallylazy.Pair;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.HttpDatasource.httpDatasource;
@@ -26,21 +25,21 @@ import static com.googlecode.barongreenback.crawler.failures.FailureRepository.R
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.RECORD;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.SOURCE;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
-import static com.googlecode.barongreenback.crawler.failures.FailureRepository.VISITED;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.funclate.Model.parse;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Uri.uri;
 
 abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     private final CrawlerRepository crawlerRepository;
     private final CheckpointHandler checkpointHandler;
+    protected final VisitedFactory visited;
 
-    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler) {
+    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, VisitedFactory visited) {
         this.crawlerRepository = crawlerRepository;
         this.checkpointHandler = checkpointHandler;
+        this.visited = visited;
     }
 
     public Definition destination(Record record) {
@@ -59,39 +58,7 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
                 set(URI, failure.job().datasource().uri()).
                 set(SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
                 set(RECORD, toJson(failure.job().record())).
-                set(CRAWLER_ID, failure.job().crawlerId()).
-                set(VISITED, toJson(failure.job().visited()));
-    }
-
-    private String toJson(Set<HttpDatasource> visited) {
-        return sequence(visited).fold(model(), toModel()).toString();
-    }
-
-    private Function2<Model, HttpDatasource, Model> toModel() {
-        return new Function2<Model, HttpDatasource, Model>() {
-            @Override
-            public Model call(Model model, HttpDatasource httpDatasource) throws Exception {
-                return model.add("visited", model().add("source", RecordDefinition.toModel(httpDatasource.source())).add("uri", httpDatasource.uri()));
-            }
-        };
-    }
-
-    private Set<HttpDatasource> toVisited(String json) {
-        return sequence(parse(json).getValues("visited", Model.class)).fold(new HashSet<HttpDatasource>(), addDatasource());
-    }
-
-    private Function2<Set<HttpDatasource>, Model, Set<HttpDatasource>> addDatasource() {
-        return new Function2<Set<HttpDatasource>, Model, Set<HttpDatasource>>() {
-            @Override
-            public Set<HttpDatasource> call(Set<HttpDatasource> visiteds, Model model) throws Exception {
-                visiteds.add(toDatasource(model));
-                return visiteds;
-            }
-        };
-    }
-
-    private HttpDatasource toDatasource(Model model) {
-        return httpDatasource(uri(model.get("uri", String.class)), convert(model.get("source", Model.class)).definition());
+                set(CRAWLER_ID, failure.job().crawlerId());
     }
 
     protected Object lastCheckpointFor(Record record) {
@@ -151,9 +118,5 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
 
     protected Record crawledRecord(Record record) {
         return toRecord(record.get(RECORD));
-    }
-
-    protected Set<HttpDatasource> visited(Record record) {
-        return toVisited(record.get(VISITED));
     }
 }

@@ -17,13 +17,16 @@ public class QueuesCrawler extends AbstractCrawler {
     private final CheckpointHandler checkpointHandler;
     private final StringMappings mappings;
     private final Container requestContainer;
+    private final VisitedFactory visitedFactory;
 
     public QueuesCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository,
-                         CheckpointHandler checkpointHandler, StringMappings mappings, Container requestContainer) {
+                         CheckpointHandler checkpointHandler, StringMappings mappings, Container requestContainer,
+                         VisitedFactory visitedFactory) {
         super(crawlerRepository, viewsRepository);
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
         this.requestContainer = requestContainer;
+        this.visitedFactory = visitedFactory;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class QueuesCrawler extends AbstractCrawler {
         Container crawlerScope = crawlerScope(id, crawler);
 
         return crawlerScope.get(StagedJobExecutor.class).crawlAndWait(
-                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
+                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, visitedFactory));
     }
 
     private Container crawlerScope(UUID id, Model crawler) {
