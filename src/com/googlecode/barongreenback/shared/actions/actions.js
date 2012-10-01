@@ -31,8 +31,13 @@ jQuery(document).ready(function() {
         jQuery('.selectors a.selectPage').click();
         BGB.search.bulk.actions.removeAllIdentifiers();
         jQuery('div.actions form').append('<input type="hidden" name="query" value="' + jQuery('meta[name="query"]').attr('content') + '">');
-        jQuery('.actions .message').text('ALL ' + BGB.search.rowCount() +' rows are selected');b
+        jQuery('.actions .message').text('ALL ' + BGB.search.rowCount() +' rows are selected');
 
+        return false;
+    });
+    jQuery('.selectors a.clearSelection').click(function() {
+        jQuery('table.results tr.selected >td:first-child').click();
+        BGB.search.bulk.actions.removeAllIdentifiers();
         return false;
     });
 });

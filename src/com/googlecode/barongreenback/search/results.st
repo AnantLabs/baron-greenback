@@ -15,12 +15,13 @@ $if(results)$
 </div>
 <div>
     <div class="selectors">
+        <a href="#" class="clearSelection">Clear Selection</a>
         <a href="#" class="selectPage">Select Page</a>
         <a href="#" class="selectAll">Select ALL</a>
-        </div>
+    </div>
     <div class="pager">
-    $pager$
-        </div>
+        $pager$
+    </div>
 </div>
 
 $endif$
