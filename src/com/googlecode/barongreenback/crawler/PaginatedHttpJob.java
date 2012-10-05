@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -15,10 +16,8 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
@@ -34,12 +33,11 @@ import static com.googlecode.totallylazy.Xml.functions.selectContents;
 import static com.googlecode.totallylazy.Xml.functions.selectNodes;
 
 public class PaginatedHttpJob extends HttpJob {
-
-    protected PaginatedHttpJob(Map<String, Object> context) {
+    protected PaginatedHttpJob(Model context) {
         super(context);
     }
 
-    static PaginatedHttpJob paginatedHttpJob(Map<String, Object> context) {
+    static PaginatedHttpJob paginatedHttpJob(Model context) {
         return new PaginatedHttpJob(context);
     }
 
@@ -47,13 +45,12 @@ public class PaginatedHttpJob extends HttpJob {
         return paginatedHttpJob(createContext(crawlerId, record, datasource, destination, checkpoint, moreXPath, mappings, visited));
     }
 
-    protected static Map<String, Object> createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
-        Map<String, Object> context = createContext(crawlerId, record, datasource, destination, visited);
-        context.put("moreXPath", moreXPath);
-        context.put("checkpoint", checkpoint);
-        context.put("checkpointXPath", checkpointXPath(datasource.source()));
-        context.put("checkpointAsString", checkpointAsString(mappings, checkpoint));
-        return context;
+    protected static Model createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
+        return createContext(crawlerId, record, datasource, destination, visited).
+                set("moreXPath", moreXPath).
+                set("checkpoint", checkpoint).
+                set("checkpointXPath", checkpointXPath(datasource.source())).
+                set("checkpointAsString", checkpointAsString(mappings, checkpoint));
     }
 
     protected static String checkpointXPath(Definition source) {
@@ -106,9 +103,7 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     private PaginatedHttpJob job(HttpDatasource datasource) {
-        ConcurrentHashMap<String, Object> newContext = new ConcurrentHashMap<String, Object>(context);
-        newContext.put("datasource", datasource);
-        return paginatedHttpJob(newContext);
+        return paginatedHttpJob(context.set("datasource", datasource));
     }
 
     protected Sequence<String> selectCheckpoints(Document document) {
@@ -120,15 +115,15 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     private String moreXPath() {
-        return (String) context.get("moreXPath");
+        return context.get("moreXPath");
     }
 
     private String checkpointXPath() {
-        return (String) context.get("checkpointXPath");
+        return context.get("checkpointXPath");
     }
 
     private String checkpointAsString() {
-        return (String) context.get("checkpointAsString");
+        return context.get("checkpointAsString");
     }
 
     @Override

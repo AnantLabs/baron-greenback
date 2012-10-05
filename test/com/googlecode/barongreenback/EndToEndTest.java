@@ -93,7 +93,6 @@ public class EndToEndTest extends ApplicationTests {
 //        crawlSampleData(importCrawler("testCrawler.json"), "test");
         crawlSampleData(importCrawler("testQueuesCrawler.json"), "test");
         ViewSearchPage viewSearchPage = view("test");
-        System.out.println("viewSearchPage = " + viewSearchPage);
 
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
 

@@ -1,68 +1,63 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
-import static java.util.Collections.unmodifiableMap;
+import static com.googlecode.funclate.Model.immutable.model;
 
 public class HttpJob implements StagedJob {
-    protected final Map<String, Object> context;
+    protected final Model context;
 
-    protected HttpJob(Map<String, Object> context) {
-        this.context = unmodifiableMap(context);
+    protected HttpJob(Model context) {
+        this.context = context;
     }
 
     public static HttpJob httpJob(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
-        ConcurrentMap<String, Object> context = createContext(crawlerId, record, datasource, destination, visited);
-        return new HttpJob(context);
+        return new HttpJob(createContext(crawlerId, record, datasource, destination, visited));
     }
 
-    protected static ConcurrentMap<String, Object> createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
-        ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
-        context.put("record", record);
-        context.put("crawlerId", crawlerId);
-        context.put("datasource", datasource);
-        context.put("destination", destination);
-        context.put("visited", visited);
-        return context;
+    protected static Model createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
+        return model().
+                set("record", record).
+                set("crawlerId", crawlerId).
+                set("datasource", datasource).
+                set("destination", destination).
+                set("visited", visited);
     }
 
     @Override
     public UUID crawlerId() {
-        return (UUID) context.get("crawlerId");
+        return context.get("crawlerId");
     }
 
     @Override
     public HttpDatasource datasource() {
-        return (HttpDatasource) context.get("datasource");
+        return context.get("datasource");
     }
 
     @Override
     public Definition destination() {
-        return (Definition) context.get("destination");
+        return context.get("destination");
     }
 
     @Override
     public Set<HttpDatasource> visited() {
-        return (Set<HttpDatasource>) context.get("visited");
+        return context.get("visited");
     }
 
     @Override
     public Record record() {
-        return (Record) context.get("record");
+        return context.get("record");
     }
 
     @Override

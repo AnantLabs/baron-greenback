@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
@@ -12,13 +13,12 @@ import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
-    private MasterPaginatedHttpJob(Map<String, Object> context) {
+    private MasterPaginatedHttpJob(Model context) {
         super(context);
     }
 
