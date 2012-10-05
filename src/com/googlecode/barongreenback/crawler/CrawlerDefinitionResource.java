@@ -161,8 +161,8 @@ public class CrawlerDefinitionResource {
             }
 
             private Response forbidden(Model model) {
-                String updates = model.get("form", Model.class).get("update", String.class);
-                return response(Status.FORBIDDEN).entity(format("Crawler '%s' not enabled", updates)).build();
+                String name = model.get("form", Model.class).get("name", String.class);
+                return response(Status.FORBIDDEN).entity(format("Crawler '%s' not enabled", name)).build();
             }
         };
     }
