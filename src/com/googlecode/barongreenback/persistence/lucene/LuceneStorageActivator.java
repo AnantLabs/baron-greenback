@@ -14,7 +14,7 @@ public class LuceneStorageActivator implements Callable<LuceneStorage> {
 
     public LuceneStorageActivator(BaronGreenbackProperties properties, Container container) {
         this.container = container;
-        backgroundThread = Boolean.valueOf(properties.getProperty("lucene.background.thread"));
+        backgroundThread = Boolean.valueOf(properties.getProperty("lucene.background.thread", "true"));
     }
 
     @Override
