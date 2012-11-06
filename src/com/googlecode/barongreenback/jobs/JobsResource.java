@@ -4,10 +4,10 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.utterlyidle.HttpMessageParser;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.annotations.ANY;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -27,9 +27,12 @@ import static com.googlecode.barongreenback.jobs.Job.REQUEST;
 import static com.googlecode.barongreenback.jobs.Job.RESPONSE;
 import static com.googlecode.barongreenback.jobs.Job.RUNNING;
 import static com.googlecode.barongreenback.jobs.Job.STARTED;
+import static com.googlecode.barongreenback.jobs.Job.job;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.utterlyidle.HttpMessageParser.parseRequest;
+import static com.googlecode.utterlyidle.HttpMessageParser.parseResponse;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 import static com.googlecode.utterlyidle.RequestBuilder.modify;
 
@@ -46,12 +49,12 @@ public class JobsResource {
         this.redirector = redirector;
     }
 
-    @POST
+    @ANY
     @Path("schedule/{id}/{seconds}")
     public Response schedule(@PathParam("id") UUID id, @PathParam("seconds") Long seconds, @PathParam("$") String endOfUrl) throws Exception {
         Request scheduledRequest = modify(request).uri(request.uri().path(endOfUrl)).build();
 
-        scheduler.schedule(Job.job(id).interval(seconds).request(scheduledRequest.toString()));
+        scheduler.schedule(job(id).interval(seconds).request(scheduledRequest.toString()));
 
         return redirectToList();
     }
@@ -59,7 +62,7 @@ public class JobsResource {
     @POST
     @Path("reschedule")
     public Response reschedule(@FormParam("id") UUID id, @FormParam("seconds") Long seconds) throws Exception {
-        scheduler.schedule(Job.job(id).interval(seconds));
+        scheduler.schedule(job(id).interval(seconds));
         return redirectToList();
     }
 
@@ -113,7 +116,7 @@ public class JobsResource {
         if(requestMessage == null){
             return null;
         }
-        Request request = HttpMessageParser.parseRequest(requestMessage);
+        Request request = parseRequest(requestMessage);
         return asModel(request);
     }
 
@@ -130,7 +133,7 @@ public class JobsResource {
         if(responseMessage == null){
             return null;
         }
-        Response response = HttpMessageParser.parseResponse(responseMessage);
+        Response response = parseResponse(responseMessage);
         return asModel(response);
     }
 
