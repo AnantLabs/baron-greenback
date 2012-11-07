@@ -26,6 +26,7 @@ import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
 import static com.googlecode.barongreenback.jobs.Job.REQUEST;
 import static com.googlecode.barongreenback.jobs.Job.RESPONSE;
 import static com.googlecode.barongreenback.jobs.Job.RUNNING;
+import static com.googlecode.barongreenback.jobs.Job.START;
 import static com.googlecode.barongreenback.jobs.Job.STARTED;
 import static com.googlecode.barongreenback.jobs.Job.job;
 import static com.googlecode.funclate.Model.mutable.model;
@@ -50,11 +51,21 @@ public class JobsResource {
     }
 
     @ANY
-    @Path("schedule/{id}/{seconds}")
-    public Response schedule(@PathParam("id") UUID id, @PathParam("seconds") Long seconds, @PathParam("$") String endOfUrl) throws Exception {
+    @Path("schedule/{id}/{interval}")
+    public Response schedule(@PathParam("id") UUID id, @PathParam("interval") Long intervalInSeconds, @PathParam("$") String endOfUrl) throws Exception {
         Request scheduledRequest = modify(request).uri(request.uri().path(endOfUrl)).build();
 
-        scheduler.schedule(job(id).interval(seconds).request(scheduledRequest.toString()));
+        scheduler.schedule(job(id).interval(intervalInSeconds).request(scheduledRequest.toString()));
+
+        return redirectToList();
+    }
+
+    @ANY
+    @Path("schedule/{id}/{start}/{interval}")
+    public Response schedule(@PathParam("id") UUID id, @PathParam("start") String start, @PathParam("interval") Long intervalInSeconds, @PathParam("$") String endOfUrl) throws Exception {
+        Request scheduledRequest = modify(request).uri(request.uri().path(endOfUrl)).build();
+
+        scheduler.schedule(job(id).start(start).interval(intervalInSeconds).request(scheduledRequest.toString()));
 
         return redirectToList();
     }
@@ -99,11 +110,12 @@ public class JobsResource {
         return new Callable1<Record, Model>() {
             public Model call(Record record) throws Exception {
                 return model().
-                        add("status", Boolean.TRUE.equals(record.get(RUNNING))? "running" : "idle").
                         add("id", record.get(JOB_ID)).
+                        add("status", Boolean.TRUE.equals(record.get(RUNNING))? "running" : "idle").
+                        add("start", record.get(START)).
+                        add("seconds", record.get(INTERVAL)).
                         add("request", addRequest(record)).
                         add("response", addResponse(record)).
-                        add("seconds", record.get(INTERVAL)).
                         add("started", record.get(STARTED)).
                         add("completed", record.get(COMPLETED)).
                         add("duration", record.get(DURATION));

@@ -17,7 +17,7 @@ import static com.googlecode.totallylazy.Strings.empty;
 
 public class Jobs {
     private final Records records;
-    private static final Definition JOBS = Definition.constructors.definition("jobs", Job.JOB_ID, Job.REQUEST, Job.RESPONSE, Job.INTERVAL, Job.DURATION, Job.STARTED, Job.COMPLETED, Job.RUNNING);
+    private static final Definition JOBS = Definition.constructors.definition("jobs", Job.JOB_ID, Job.REQUEST, Job.RESPONSE, Job.START, Job.INTERVAL, Job.DURATION, Job.STARTED, Job.COMPLETED, Job.RUNNING);
 
     public Jobs(final BaronGreenbackRecords records) {
         this.records = records.value();

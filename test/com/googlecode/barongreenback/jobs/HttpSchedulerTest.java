@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.lazyrecords.memory.MemoryRecords;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.totallylazy.time.FixedClock;
 import com.googlecode.utterlyidle.RequestBuilder;
@@ -54,9 +55,7 @@ public class HttpSchedulerTest {
         public long delay;
 
         @Override
-        public void schedule(UUID id, Callable<?> command, Date start, long numberOfSeconds) {}
-
-        public void schedule(UUID id, Callable<?> command, final long numberOfSeconds) {
+        public void schedule(UUID id, Callable<?> command, Option<Date> start, long numberOfSeconds) {
             this.delay = numberOfSeconds;
         }
 

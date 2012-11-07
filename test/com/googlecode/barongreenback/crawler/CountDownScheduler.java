@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.Scheduler;
+import com.googlecode.totallylazy.Option;
 
 import java.util.Date;
 import java.util.UUID;
@@ -17,12 +18,8 @@ public class CountDownScheduler implements Scheduler {
     }
 
     @Override
-    public void schedule(UUID id, Callable<?> command, Date start, long numberOfSeconds) {
+    public void schedule(UUID id, Callable<?> command, Option<Date> start, long numberOfSeconds) {
         scheduler.schedule(id, decorate(latch, command), start, numberOfSeconds);
-    }
-
-    public void schedule(UUID id, Callable<?> command, long numberOfSeconds) {
-        scheduler.schedule(id, decorate(latch, command), numberOfSeconds);
     }
 
     public void cancel(UUID id) {

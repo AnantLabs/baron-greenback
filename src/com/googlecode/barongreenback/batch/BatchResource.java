@@ -39,7 +39,6 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.messages.Messages.error;
 import static com.googlecode.barongreenback.shared.messages.Messages.success;
-import static com.googlecode.funclate.Model.mutable;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Files.files;
 import static com.googlecode.totallylazy.Files.hasSuffix;
@@ -54,8 +53,8 @@ import static java.lang.String.format;
 @Path("batch")
 @Produces(MediaType.TEXT_HTML)
 public class BatchResource {
-
     public static final File BACKUP_LOCATION = Files.temporaryDirectory();
+    private static final UUID BACKUP_JOB_ID = UUID.fromString("70203355-d7d3-4477-85ef-d3309f21fae0");
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final Persistence persistence;
@@ -152,9 +151,7 @@ public class BatchResource {
     @Path("delete")
     public Response delete(@FormParam("id") String id) {
         try {
-            File file = new File(BACKUP_LOCATION, id);
-            Files.delete(file);
-            file.delete();
+            Files.delete(new File(BACKUP_LOCATION, id));
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Deleted backed '%s'", id), Category.SUCCESS)));
         } catch (Exception e) {
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Error occurred when deleting backup: '%s'", e.getMessage()), Category.ERROR)));
@@ -203,7 +200,10 @@ public class BatchResource {
     private Model addBackups(Model model) {
         return model.
                 add("backupLocation", backupNow()).
-                add("backups", files(BACKUP_LOCATION).filter(hasSuffix("bgb")).map(asModel()).toList());
+                add("backups", files(BACKUP_LOCATION).filter(hasSuffix("bgb")).map(asModel()).toList()).
+                add("id", BACKUP_JOB_ID).
+                add("start", "0200").
+                add("interval", "86400");
 
     }
 

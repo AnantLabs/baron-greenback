@@ -3,10 +3,12 @@ package com.googlecode.barongreenback.jobs;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.time.Clock;
 
 import java.util.Date;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.jobs.NextTime.nextTime;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 
@@ -14,6 +16,7 @@ public class Job {
     public static final Keyword<UUID> JOB_ID = keyword("jobs_id", UUID.class);
     public static final Keyword<String> REQUEST = keyword("request", String.class);
     public static final Keyword<String> RESPONSE = keyword("response", String.class);
+    public static final Keyword<String> START = keyword("start", String.class);
     public static final Keyword<Long> INTERVAL = keyword("interval", Long.class);
     public static final Keyword<Long> DURATION = keyword("duration", Long.class);
     public static final Keyword<Date> STARTED = keyword("started", Date.class);
@@ -48,6 +51,14 @@ public class Job {
 
     public Job completed(Date completed) {
         return set(COMPLETED, completed);
+    }
+
+    public Job start(String start) {
+        return set(START, start);
+    }
+
+    public static Date start(String time, Clock clock) {
+        return nextTime(time, clock).value();
     }
 
     public Job running(boolean running) {

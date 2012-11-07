@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.StartupModule;
@@ -16,7 +15,6 @@ public class JobsModule implements ResourcesModule, ApplicationScopedModule, Req
                 add(annotatedClass(JobsResource.class)).
                 add(annotatedClass(BatchJobsResource.class));
     }
-
 
     public Container addPerRequestObjects(Container container) throws Exception {
         return container.

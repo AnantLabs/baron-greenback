@@ -2,11 +2,16 @@ package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.totallylazy.time.Seconds;
-import com.googlecode.utterlyidle.*;
+import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.ResponseBuilder;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 import com.googlecode.yadic.Container;
 
@@ -14,7 +19,11 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.jobs.Job.*;
+import static com.googlecode.barongreenback.jobs.Job.INTERVAL;
+import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
+import static com.googlecode.barongreenback.jobs.Job.REQUEST;
+import static com.googlecode.barongreenback.jobs.Job.START;
+import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Runnables.VOID;
@@ -37,8 +46,7 @@ public class HttpScheduler {
         jobs.createOrUpdate(job);
 
         UUID id = job.get(JOB_ID);
-        Record fullRecord = job(id).get();
-        scheduler.schedule(id, httpTask(id, application, parseRequest(fullRecord.get(REQUEST))), fullRecord.get(INTERVAL));
+        schedule(job(id).get());
         return id;
     }
 
@@ -49,8 +57,7 @@ public class HttpScheduler {
     public void stop() {
         try {
             jobs().each(cancel());
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public void remove(UUID id) {
@@ -111,8 +118,21 @@ public class HttpScheduler {
     private Callable1<Record, Void> schedule() {
         return new Callable1<Record, Void>() {
             public Void call(Record record) throws Exception {
-                scheduler.schedule(record.get(JOB_ID), httpTask(record.get(JOB_ID), application, parseRequest(record.get(REQUEST))), record.get(INTERVAL));
+                HttpScheduler.this.schedule(record);
                 return VOID;
+            }
+        };
+    }
+
+    private void schedule(Record record) {
+        scheduler.schedule(record.get(JOB_ID), httpTask(record.get(JOB_ID), application, parseRequest(record.get(REQUEST))), option(record.get(START)).map(toStart()), record.get(INTERVAL));
+    }
+
+    private Function1<String, Date> toStart() {
+        return new Function1<String, Date>() {
+            @Override
+            public Date call(String time) throws Exception {
+                return Job.start(time, clock);
             }
         };
     }

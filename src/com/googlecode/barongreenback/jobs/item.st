@@ -1,5 +1,6 @@
 <tr class="job">
     <td><span class="jobstatus $item.status$">$item.status$</span></td>
+    <td><span class="start">$item.start$</span></td>
     <td><span class="seconds">$item.seconds$</span></td>
     <td>
         <div class="request">

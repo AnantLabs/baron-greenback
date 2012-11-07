@@ -15,7 +15,7 @@ $message()$
     <tr class="backup">
         <td colspan="4">
             $post(name="restore", content={
-            $input(name="location", message="")$
+                $input(name="location", message="")$
             })$
         </td>
     </tr>
@@ -29,6 +29,7 @@ $message()$
     $get(name="import")$
     $get(name="export")$
     $post(name="deleteAll", value="Delete All")$
+    $post(name="scheduleBackup", value="Schedule Backup", url={$base$jobs/schedule/$id$/$start$/$interval$/backup})$
 </div>
 
 <script>

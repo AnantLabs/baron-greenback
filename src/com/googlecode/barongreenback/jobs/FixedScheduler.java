@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.jobs;
 
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.time.Clock;
 
 import java.io.Closeable;
@@ -28,14 +29,11 @@ public class FixedScheduler implements Scheduler, Closeable {
     }
 
     @Override
-    public void schedule(UUID id, Callable<?> command, Date start, long numberOfSeconds) {
+    public void schedule(UUID id, Callable<?> command, Option<Date> start, long numberOfSeconds) {
         cancel(id);
-        FutureJob job = new FutureJob(service.scheduleWithFixedDelay(function(command), between(clock.now(), start), numberOfSeconds, SECONDS));
+        Date now = clock.now();
+        FutureJob job = new FutureJob(service.scheduleAtFixedRate(function(command), between(now, start.getOrElse(now)), numberOfSeconds, SECONDS));
         jobs.put(id, job);
-    }
-
-    public void schedule(UUID id, Callable<?> command, long numberOfSeconds) {
-        schedule(id, command, clock.now(), numberOfSeconds);
     }
 
     public void cancel(UUID id) {

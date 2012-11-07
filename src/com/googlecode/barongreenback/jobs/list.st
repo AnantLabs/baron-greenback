@@ -7,7 +7,7 @@
 <body class="list">
 
 <table class="results zebra-striped">
-    $thead(headers=["Status", "Interval (Seconds)", "Request", "Response", "Started", "Completed", "Duration (Seconds)", "action" ])$
+    $thead(headers=["Status", "Start Time", "Interval (Seconds)", "Request", "Response", "Started", "Completed", "Duration (Seconds)", "action" ])$
     <tbody>
     $jobs:item(item=it)$
     </tbody>
