@@ -152,8 +152,7 @@ public class BatchResource {
     public Response backup(@FormParam("location") String location) {
         try {
             persistence.backup(new File(location));
-            Response response = redirector.seeOther(method(on(BatchResource.class).operations(format("Index has been backed up to '%s'", location), Category.SUCCESS)));
-            return response;
+            return redirector.seeOther(method(on(BatchResource.class).operations(format("Index has been backed up to '%s'", location), Category.SUCCESS)));
         } catch (Exception e) {
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Error occurred when backing up the index: '%s'", e.getMessage()), Category.ERROR)));
         }

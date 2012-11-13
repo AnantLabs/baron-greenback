@@ -3,7 +3,9 @@ package com.googlecode.barongreenback.jobs;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.InternalRequestMarker;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
@@ -73,8 +75,8 @@ public class JobsResource {
 
     @POST
     @Path("reschedule")
-    public Response reschedule(@FormParam("id") UUID id, @FormParam("seconds") Long seconds) throws Exception {
-        scheduler.schedule(job(id).interval(seconds));
+    public Response reschedule(@FormParam("id") UUID id, @FormParam("seconds") Long seconds, @FormParam("start") String start) throws Exception {
+        scheduler.schedule(job(id).interval(seconds).start(start));
         return redirectToList();
     }
 
@@ -82,7 +84,7 @@ public class JobsResource {
     @Path("edit")
     public Model edit(@QueryParam("id") UUID id) {
         Record job = scheduler.job(id).get();
-        return model().add("id", id.toString()).add("seconds", job.get(INTERVAL));
+        return model().add("id", id.toString()).add("seconds", job.get(INTERVAL)).add("start", job.get(START));
     }
 
     @POST

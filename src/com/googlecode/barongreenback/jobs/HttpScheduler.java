@@ -27,6 +27,7 @@ import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Runnables.VOID;
+import static com.googlecode.totallylazy.Strings.isEmpty;
 import static com.googlecode.utterlyidle.HttpMessageParser.parseRequest;
 
 public class HttpScheduler {
@@ -57,7 +58,8 @@ public class HttpScheduler {
     public void stop() {
         try {
             jobs().each(cancel());
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public void remove(UUID id) {
@@ -125,7 +127,8 @@ public class HttpScheduler {
     }
 
     private void schedule(Record record) {
-        scheduler.schedule(record.get(JOB_ID), httpTask(record.get(JOB_ID), application, parseRequest(record.get(REQUEST))), option(record.get(START)).map(toStart()), record.get(INTERVAL));
+        Option<String> start = option(isEmpty(record.get(START)) ? null : record.get(START));
+        scheduler.schedule(record.get(JOB_ID), httpTask(record.get(JOB_ID), application, parseRequest(record.get(REQUEST))), start.map(toStart()), record.get(INTERVAL));
     }
 
     private Function1<String, Date> toStart() {
