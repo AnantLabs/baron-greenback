@@ -36,7 +36,7 @@ public class EndToEndTest extends ApplicationTests {
 
     @Test
     public void paginationWorksCorrectly() throws Exception {
-        crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:20Z")), "newsfeed");
+        crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:21Z")), "newsfeed");
         ViewSearchPage page1 = viewWithPageSize("newsfeed", 1);
         assertThat(page1.resultsSize(), NumberMatcher.is(1));
 
@@ -50,7 +50,7 @@ public class EndToEndTest extends ApplicationTests {
 
     @Test
     public void createCrawlerViaUiWithCheckpointOnFirstPage() throws Exception {
-        final CrawlerListPage crawler = createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:25Z"));
+        final CrawlerListPage crawler = createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:26Z"));
         crawlSampleData(crawler, "newsfeed");
         ViewSearchPage viewSearchPage = view("newsfeed");
 
@@ -64,7 +64,7 @@ public class EndToEndTest extends ApplicationTests {
 
     @Test
     public void createCrawlerViaUiWithPaginationAndCheckpointAndCrawlAndThenViewAllRecords() throws Exception {
-        crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:20Z")), "newsfeed");
+        crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:21Z")), "newsfeed");
         ViewSearchPage viewSearchPage = view("newsfeed");
 
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(3));

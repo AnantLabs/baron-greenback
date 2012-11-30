@@ -8,6 +8,9 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.time.Dates;
+
+import java.util.Date;
 
 import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -51,7 +54,13 @@ public class CheckPointStopper implements Feeder<Uri> {
     public static  Callable1<Object, Boolean> matchesCurrentCheckPoint(final Object currentCheckPoint) {
         return new Callable1<Object, Boolean>() {
             public Boolean call(Object instance) throws Exception {
-                return currentCheckPoint != null && currentCheckPoint.equals(instance);
+                if (currentCheckPoint == null) {
+                    return false;
+                }
+                if (currentCheckPoint instanceof Date) {
+                    return (Dates.parse(instance.toString())).before((Date) currentCheckPoint);
+                }
+                return currentCheckPoint.equals(instance);
             }
         };
     }
