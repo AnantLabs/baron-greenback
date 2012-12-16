@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<ul class="tabs">
+<ul class="nav nav-tabs">
     $views:{ view |
     <li class="view $view.name$ count$view.itemsTotal$ $if(view.current)$ active $endif$">
         <a class="tab" href="$view.url$">$view.name$ <span class="count">($view.itemsTotal$)</span></a>

@@ -4,16 +4,17 @@
     <title>$title$ - Baron Greenback</title>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
     <link rel="shortcut icon" href="$base$baron-greenback/shared/favicon.ico"/>
-    <link rel="stylesheet" type="text/css" href="$base$baron-greenback/shared/style.less"/>
+    <link rel="stylesheet/less" type="text/css" href="$base$baron-greenback/shared/style.less"/>
+    <script src="$base$baron-greenback/shared/less-1.3.1.js"></script>
     $head$
 </head>
 <body class="$body.class$ bgb">
 
-<div class="topbar">
-    <div class="fill">
-        <div class="container">
-            <h3><a href="/" class="home">Baron Greenback: $title$</a></h3>
-            <ul class="nav secondary-nav">
+<div class="navbar navbar-inverse navbar-static-top">
+    <div class="navbar-inner">
+        <div>
+            <a href="/" class="home brand pull-left">Baron Greenback: $title$</a>
+            <ul class="nav pull-right">
                 <li class="dropdown">
                     <ul class="dropdown-menu">
                         $bgbAdmin()$

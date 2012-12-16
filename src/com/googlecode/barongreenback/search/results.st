@@ -19,7 +19,7 @@ $if(results)$
         <a href="#" class="selectPage">Select Page</a>
         <a href="#" class="selectAll">Select ALL</a>
     </div>
-    <div class="pager">
+    <div class="pagination-controls">
         $pager$
     </div>
 </div>

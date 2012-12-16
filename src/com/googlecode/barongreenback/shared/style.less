@@ -3,6 +3,11 @@
 
 @basefont:          12px;
 @baseline:          14px;
+@blur-radius: 3px;
+
+.border-radius {
+    .border-radius(5px);
+}
 
 select, input[type=file] {
     height: @baseline * 2;
@@ -27,7 +32,6 @@ select, input[type=file] {
 }
 
 .shadow (@shadow-color) {
-    @blur-radius: 3px;
     @spread-radius: 1px;
     -moz-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
     -webkit-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
@@ -60,7 +64,7 @@ h1, h2, h3, h4, h5, h6, .btn, a.update {
 }
 
 .btn {
-    &.primary, &.danger, &.success, &.info {
+    &-primary, &-danger, &-success, &-info {
         &:hover {
             color: #fff;
         }
@@ -79,12 +83,12 @@ input[type="submit"] {
 
 input.crawl, input.search, a.new, input.import, input.save, input[type=submit].start, body.views a.edit, input.backup, input.restore {
     .btn;
-    .btn.primary;
+    .btn-primary;
 }
 
 input.crawl-and-create-view {
     .btn;
-    .btn.info;
+    .btn-info;
 }
 
 input.more, a.export, a.import, a.edit, a.cancel, a.download, a.selectPage, a.selectAll{
@@ -93,12 +97,12 @@ input.more, a.export, a.import, a.edit, a.cancel, a.download, a.selectPage, a.se
 
 input.delete, input.stop, input.reset, input.resetAll, input.deleteAll, input.ignore, input.ignoreAll, input.disable {
     .btn;
-    .btn.danger;
+    .btn-danger;
 }
 
 input.enable, a.crawler-status, a.crawler-failures {
     .btn;
-    .btn.success;
+    .btn-success;
 }
 
 .fixIE7Overlapping {
@@ -120,11 +124,12 @@ div.control, div.nameValue {
 
 
 
-ul.tabs {
+ul.nav-tabs {
     float: none;
+    margin-bottom: 0;
 }
 
-th, ul.tabs li {
+th, ul.nav-tabs li {
     text-transform: capitalize;
 }
 
@@ -134,7 +139,7 @@ div.container, .container {
 }
 
 .content {
-    margin: 50px 20px;
+    margin: 10px;
 }
 
 .shadow(lightgray); // Dan: Fixes wierd bug in less.js where it can't find .border-radius in next section
@@ -223,7 +228,7 @@ body {
     padding-left: 20px;
 }
 
-.topbar {
+.navbar {
     a.home {
         background: left no-repeat url(small-logo.png);
         padding-left: 40px;
@@ -231,11 +236,15 @@ body {
 }
 
 table {
+    .table;
+    .table-bordered;
+
     th, td {
         padding: 5px 7px 4px;
     }
 
     &.results {
+        .table-striped;
         th a {
             color: inherit;
         }
@@ -384,7 +393,7 @@ div.actions form {
     float: right;
     .clearSelection {
         .btn;
-        .btn.danger;
+        .btn-danger;
     }
     margin-top: 5px;
 }
@@ -417,4 +426,127 @@ div.actions form {
 
 .resources .resource ul {
     list-style: none;
+}
+
+.pager-and-rowpager .pagination, .pager-and-rowpager .rowpager {
+    .inlineBlock;
+    margin: 0;
+    padding: 0;
+    form {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.pager-and-rowpager .pagination {
+    padding-top: 5px;
+}
+
+.pager-and-rowpager .rowpager {
+    margin: 20px 0;
+}
+
+.pager-and-rowpager div {
+    vertical-align: middle;
+}
+
+
+
+/* Tablesorter css, removed from Bootstrap 2.0 */
+table .header {
+    cursor: pointer;
+}
+table .header:after {
+  content: "";
+  float: right;
+  margin-top: 7px;
+  border-width: 0 4px 4px;
+  border-style: solid;
+  border-color: #000000 transparent;
+  visibility: hidden;
+}
+table .headerSortUp, table .headerSortDown {
+  background-color: #f7f7f9;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+table .header:hover:after {
+  visibility: visible;
+}
+table .headerSortDown:after, table .headerSortDown:hover:after {
+  visibility: visible;
+  filter: alpha(opacity=60);
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+}
+table .headerSortUp:after {
+  border-bottom: none;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000000;
+  visibility: visible;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  filter: alpha(opacity=60);
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+}
+
+
+/* table header colours, also removed from 2.0 */
+table {
+  // Blue Table Headings
+  .blue {
+    color: @blue;
+    border-bottom-color: @blue;
+  }
+  .headerSortUp.blue,
+  .headerSortDown.blue {
+    background-color: lighten(@blue, 40%);
+  }
+  // Green Table Headings
+  .green {
+    color: @green;
+    border-bottom-color: @green;
+  }
+  .headerSortUp.green,
+  .headerSortDown.green {
+    background-color: lighten(@green, 40%);
+  }
+  // Red Table Headings
+  .red {
+    color: @red;
+    border-bottom-color: @red;
+  }
+  .headerSortUp.red,
+  .headerSortDown.red {
+    background-color: lighten(@red, 50%);
+  }
+  // Yellow Table Headings
+  .yellow {
+    color: @yellow;
+    border-bottom-color: @yellow;
+  }
+  .headerSortUp.yellow,
+  .headerSortDown.yellow {
+    background-color: lighten(@yellow, 40%);
+  }
+  // Orange Table Headings
+  .orange {
+    color: @orange;
+    border-bottom-color: @orange;
+  }
+  .headerSortUp.orange,
+  .headerSortDown.orange {
+    background-color: lighten(@orange, 40%);
+  }
+  // Purple Table Headings
+  .purple {
+    color: @purple;
+    border-bottom-color: @purple;
+  }
+  .headerSortUp.purple,
+  .headerSortDown.purple {
+    background-color: lighten(@purple, 40%);
+  }
 }
