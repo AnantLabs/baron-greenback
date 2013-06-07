@@ -12,20 +12,32 @@ import com.googlecode.barongreenback.queues.QueuesModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
 import com.googlecode.barongreenback.views.ViewsModule;
+import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.handlers.GZipPolicy;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
 import com.googlecode.utterlyidle.profiling.ProfilingModule;
+import com.googlecode.utterlyidle.sitemesh.ActivateSiteMeshModule;
+import com.googlecode.utterlyidle.sitemesh.DecoratorProvider;
+import com.googlecode.utterlyidle.sitemesh.DecoratorRule;
+import com.googlecode.utterlyidle.sitemesh.Decorators;
+import com.googlecode.utterlyidle.sitemesh.StringTemplateDecorators;
 import com.googlecode.yadic.Container;
 
+import java.net.URL;
 import java.util.Properties;
 
+import static com.googlecode.totallylazy.HtmlEncodedMessage.decode;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.packageUrl;
+import static com.googlecode.totallylazy.UrlEncodedMessage.encode;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -59,6 +71,41 @@ public class WebApplication extends RestApplication {
                 return container;
             }
         });
+    }
+
+    private ActivateSiteMeshModule stringTemplateDecorators(final URL templatesUrl, final DecoratorRule... rules) {
+        return new ActivateSiteMeshModule() {
+            @Override
+            protected DecoratorProvider provider(Container container) {
+                EnhancedStringTemplateGroup templateGroup = new EnhancedStringTemplateGroup(templatesUrl);
+                templateGroup.enableFormatsAsFunctions();
+                templateGroup.registerRenderer("htmlDecode", Predicates.<Object>always(), decodeHtml());
+                templateGroup.registerRenderer("urlEncode", Predicates.<Object>always(), encodeUrl());
+                return new StringTemplateDecorators(templateGroup, container);
+            }
+
+            private Callable1<Object, String> decodeHtml() {
+                return new Callable1<Object, String>() {
+                    @Override
+                    public String call(Object value) throws Exception {
+                        return decode(Strings.asString(value));
+                    }
+                };
+            }
+
+            private Callable1<Object, String> encodeUrl() {
+                return new Callable1<Object, String>() {
+                    @Override
+                    public String call(Object value) throws Exception {
+                        return encode(Strings.asString(value));
+                    }
+                };
+            }
+            @Override
+            public Decorators addDecorators(Decorators decorators) {
+                return sequence(rules).fold(decorators, Decorators.add());
+            }
+        };
     }
 
     public static void addModules(Application application) {

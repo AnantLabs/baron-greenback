@@ -1,16 +1,17 @@
 package com.googlecode.barongreenback.shared;
 
 
-import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.shared.pager.PagerRenderer;
 import com.googlecode.barongreenback.shared.pager.RequestPager;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.HtmlEncodedMessage;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.URLs;
 import com.googlecode.totallylazy.Xml;
 import com.googlecode.utterlyidle.MatchedResource;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.io.HierarchicalPath;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.net.URI;
@@ -22,6 +23,7 @@ import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.instanceOf;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.URLs.url;
+import static com.googlecode.totallylazy.UrlEncodedMessage.encode;
 
 public class StringTemplateGroupActivator implements Callable<StringTemplateGroup> {
     private final URL baseUrl;
@@ -43,7 +45,18 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
         shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer(shared));
+        shared.registerRenderer("htmlDecode", Predicates.<Object>always(), HtmlEncodedMessage.functions.decode());
+        shared.registerRenderer("urlEncode", Predicates.<Object>always(), encodeUrl());
         return new EnhancedStringTemplateGroup(baseUrl, shared);
+    }
+
+    private Callable1<Object, String> encodeUrl() {
+        return new Callable1<Object, String>() {
+            @Override
+            public String call(Object value) throws Exception {
+                return encode(Strings.asString(value));
+            }
+        };
     }
 
     public static Function1<String, String> underscores() {
