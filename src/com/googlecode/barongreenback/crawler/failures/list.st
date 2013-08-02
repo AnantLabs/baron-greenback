@@ -17,7 +17,10 @@ $message()$
     $items:item(item=it)$
     </tbody>
 </table>
-$pager$
+
+<div class="pagination-controls">
+    $pager$
+</div>
 
 <div class="actions">
     $get(url={$base$crawler/status}, class="crawler-status", name="Status")$
