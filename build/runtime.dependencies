@@ -13,7 +13,7 @@ mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1155
 mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:pack|sources:275
 mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:pack|sources:733
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:pack|sources:167
-mvn://repo.bodar.com/com.googlecode.funclate:funclate:pack|sources:128
+mvn://repo.bodar.com/com.googlecode.funclate:funclate:pack|sources:132
 mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:pack|sources:12
 
 mvn:org.mozilla:rhino:jar|sources:1.7R4

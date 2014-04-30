@@ -9,7 +9,6 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.csv.CsvWriterLegacy;
 import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
@@ -45,7 +44,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -83,14 +81,16 @@ public class SearchResource {
     private final RecordsService recordsService;
     private final Clock clock;
     private final ShortcutPolicy shortcutPolicy;
+    private final CsvWriter csvWriter;
 
-    public SearchResource(final Redirector redirector, final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock, final ShortcutPolicy shortcutPolicy) {
+    public SearchResource(final Redirector redirector, final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock, final ShortcutPolicy shortcutPolicy, CsvWriter csvWriter) {
         this.redirector = redirector;
         this.pager = pager;
         this.sorter = sorter;
         this.recordsService = recordsService;
         this.clock = clock;
         this.shortcutPolicy = shortcutPolicy;
+        this.csvWriter = csvWriter;
     }
 
     @GET
@@ -124,7 +124,7 @@ public class SearchResource {
         final Model view = recordsService.view(viewName);
         final Definition definition = recordsService.definition(view);
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
-        final Iterator<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).map(aliasFor(viewName)).iterator();
+        final Sequence<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).map(aliasFor(viewName));
 
         final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
 
@@ -137,7 +137,7 @@ public class SearchResource {
                         using(new OutputStreamWriter(new BufferedOutputStream(outputStream, 32768)), new Block<OutputStreamWriter>() {
                             @Override
                             public void execute(OutputStreamWriter writer) throws Exception {
-                                CsvWriterLegacy.writeTo(result, writer, visibleHeaders);
+                                csvWriter.writeTo(result, writer, visibleHeaders);
                             }
                         });
                     }
