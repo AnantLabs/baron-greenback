@@ -79,7 +79,7 @@ public class SearchResourceTest extends ApplicationTests {
     @Test
     public void supportsDelete() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "", true);
-        assertThat(searchPage.numberOfResults(), is(2));
+        assertThat(searchPage.numberOfResults(), is(3));
         searchPage = searchPage.delete();
         assertThat(searchPage.numberOfResults(), is(0));
     }
@@ -87,7 +87,7 @@ public class SearchResourceTest extends ApplicationTests {
     @Test
     public void supportsQueryAll() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "");
-        assertThat(searchPage.numberOfResults(), is(2));
+        assertThat(searchPage.numberOfResults(), is(3));
     }
 
     @Test
@@ -98,9 +98,9 @@ public class SearchResourceTest extends ApplicationTests {
 
     @Test
     @Table({
-            @Row({"2011/07/19"}),
-            @Row({"19/07/11"}),
-            @Row({"19/07/2011"})
+            @Row({"2011/02/19"}),
+            @Row({"19/02/11"}),
+            @Row({"19/02/2011"})
     })
     public void supportsDateQuery(String query) throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", query);
@@ -109,11 +109,22 @@ public class SearchResourceTest extends ApplicationTests {
 
     @Test
     @Table({
-            @Row({"2011/07/19 12:43:25"}),
-            @Row({"19/07/11 12:43:25"}),
-            @Row({"19/07/2011 12:43:25"})
+            @Row({"2011/02/19 12:43:25"}),
+            @Row({"19/02/11 12:43:25"}),
+            @Row({"19/02/2011 12:43:25"})
     })
     public void supportsDateTimeQuery(String query) throws Exception {
+        SearchPage searchPage = new SearchPage(browser, "users", query);
+        assertThat(searchPage.numberOfResults(), is(1));
+    }
+
+    @Test
+    @Table({
+            @Row({"2011/07/19 13:43:25"}),
+            @Row({"19/07/11 13:43:25"}),
+            @Row({"19/07/2011 13:43:25"})
+    })
+    public void supportsDateTimeQueriesFormattedInSummerTime(String query) throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", query);
         assertThat(searchPage.numberOfResults(), is(1));
     }

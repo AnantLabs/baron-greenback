@@ -45,7 +45,8 @@ public class SearchModule implements BaronGreenbackRequestScopedModule, Resource
     @Override
     public BaronGreenbackRequestScope addBaronGreenbackPerRequestObjects(BaronGreenbackRequestScope bgbRequestScope) {
         Container container = bgbRequestScope.value();
-        container.add(ParserDateConverter.class).
+        container.add(ParserUkDateConverter.class).
+                add(ParserDateConverter.class, ParserUkDateConverter.class).
                 addActivator(PredicateParser.class, StandardParserActivator.class).
                 decorate(PredicateParser.class, ParametrizedParser.class).
                 add(ParserParameters.class).

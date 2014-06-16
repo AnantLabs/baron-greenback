@@ -27,7 +27,7 @@ public class CompositeCrawlerTest extends CrawlerTests {
 
     @Test
     public void shouldNotGoPastTheCheckpoint_checkpointValue() throws Exception {
-        Sequence<Record> records = crawl(feedClient(), "2011-07-19T12:43:25.000Z", feed());
+        Sequence<Record> records = crawl(feedClient(), "2011-02-19T12:43:25.000Z", feed());
         assertThat(records.size(), Matchers.<Number>is(1));
     }
 

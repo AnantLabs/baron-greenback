@@ -2,11 +2,11 @@ package com.googlecode.barongreenback.jobshistory;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.persistence.InMemoryPersistentTypesActivator;
+import com.googlecode.barongreenback.search.ParserUkDateConverter;
 import com.googlecode.barongreenback.search.PredicateBuilder;
 import com.googlecode.barongreenback.search.StandardParserActivator;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
-import com.googlecode.lazyrecords.parser.ParserDateConverter;
 import com.googlecode.lazyrecords.parser.PredicateParser;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class RecordsJobsHistoryRepositoryTest {
     @Before
     public void initialiseRepository() throws Exception {
         final BaronGreenbackStringMappings baronGreenbackStringMappings = baronGreenbackStringMappings(new StringMappings(), new InMemoryPersistentTypesActivator().call());
-        final PredicateParser parser = new StandardParserActivator(new ParserDateConverter(), baronGreenbackStringMappings).call();
+        final PredicateParser parser = new StandardParserActivator(new ParserUkDateConverter(), baronGreenbackStringMappings).call();
         repository = new RecordsJobsHistoryRepository(records(new MemoryRecords(baronGreenbackStringMappings.value())), new PredicateBuilder(parser));
     }
 

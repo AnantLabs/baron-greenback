@@ -46,12 +46,12 @@ public class DocumentFeederTest extends CrawlerTests {
     public void supportsGettingRecords() throws Exception {
         Feeder<Uri> feeder = new UriFeeder(client(), "");
         Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
-        assertThat(records.size(), is(2));
+        assertThat(records.size(), is(3));
     }
 
     @Test
     public void supportsStoppingWhenCheckpointIsReached() throws Exception {
-        Feeder<Uri> feeder = new CheckpointStopper("2011-07-19T12:43:25.000Z", new UriFeeder(client(), ""));
+        Feeder<Uri> feeder = new CheckpointStopper("2011-02-19T12:43:25.000Z", new UriFeeder(client(), ""));
         Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
         assertThat(records.size(), is(1));
     }
@@ -60,7 +60,7 @@ public class DocumentFeederTest extends CrawlerTests {
     public void supportsFollowingMore() throws Exception {
         Feeder<Uri> feeder = new UriFeeder(client(), "/feed/link/@href");
         Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
-        assertThat(records.size(), is(4));
+        assertThat(records.size(), is(5));
     }
 
     @Test
@@ -74,6 +74,6 @@ public class DocumentFeederTest extends CrawlerTests {
     public void filtersDuplicates() throws Exception {
         Feeder<Uri> feeder = new DuplicateRemover(new UriFeeder(client(), ""));
         Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
-        assertThat(records.size(), is(2));
+        assertThat(records.size(), is(3));
     }
 }
