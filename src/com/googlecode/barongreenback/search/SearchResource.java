@@ -188,7 +188,7 @@ public class SearchResource {
                 Option<Model> view = recordsService.findView(viewName);
                 if (view.isEmpty()) return baseModel(viewName, query);
 
-                Sequence<Record> results = pager.paginate(sorter.sort(unpaged, sortKeywordFromRequest(headers(view.get())).then(unalias())));
+                Sequence<Record> results = pager.paginate(sorter.sort(unpaged, sortKeywordFromRequest(RecordsService.visibleHeaders(view.get())).then(unalias())));
                 if (results.isEmpty()) return baseModel(viewName, query);
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);

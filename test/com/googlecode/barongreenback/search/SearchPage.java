@@ -1,12 +1,14 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.RequestBuilder;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.Status;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.html.TableRow;
 
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.TITLE;
+import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
@@ -55,5 +57,14 @@ public class SearchPage {
         Response response = httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).exportCsv(view, query)))).build());
         assertThat(response.status(), is(Status.OK));
         return response.entity().toString();
+    }
+
+    public Sequence<Record> displayedEntries() {
+        return html.table("//table[contains(@class, 'results')]", "descendant::text()").bodyRows().map(new Callable1<TableRow, Record>() {
+            @Override
+            public Record call(TableRow tableRow) throws Exception {
+                return record().set(TITLE, tableRow.get(TITLE.name()).value());
+            }
+        });
     }
 }

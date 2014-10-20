@@ -7,11 +7,7 @@ import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
+import com.googlecode.lazyrecords.*;
 import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
@@ -33,6 +29,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ID;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.TITLE;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;
@@ -46,6 +44,7 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
@@ -53,6 +52,7 @@ import static org.hamcrest.Matchers.not;
 public class SearchResourceTest extends ApplicationTests {
 
     private Definition usersView;
+    private UUID viewId;
 
     @Before
     public void addSomeData() throws Exception {
@@ -65,7 +65,8 @@ public class SearchResourceTest extends ApplicationTests {
                 usersView = definition("users", keywords(recordSequence).append(keyword("updated", Date.class)));
                 records.add(usersView, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);
-                views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(usersView));
+                viewId = UUID.randomUUID();
+                views.set(viewId, ViewsRepository.convertToViewModel(usersView));
             }
         });
         waitrest.close();
@@ -181,7 +182,25 @@ public class SearchResourceTest extends ApplicationTests {
     }
 
     @Test
-    public void shouldReturnACorrectlySortedRecord() throws Exception {
+    public void shouldSortRecordsByFirstVisibleField() throws Exception {
+        final Definition viewDefinition = definition("users", ID.metadata(ViewsRepository.VISIBLE, false), TITLE.metadata(ViewsRepository.VISIBLE, true));
+        final Model viewModel = ViewsRepository.convertToViewModel(viewDefinition);
+
+        application.usingRequestScope(new Block<Container>() {
+            @Override
+            protected void execute(Container container) throws Exception {
+                final ViewsRepository viewsRepository = container.get(ViewsRepository.class);
+                viewsRepository.set(viewId, viewModel);
+            }
+        });
+
+        final SearchPage searchPage = new SearchPage(browser, "users", "");
+        final Sequence<Record> displayedEntries = searchPage.displayedEntries();
+        assertThat(displayedEntries.map(TITLE), contains("Deleted user", "Baleeted user", "Added user"));
+    }
+
+    @Test
+    public void fieldsShouldBePresentedInViewDefinitionOrder() throws Exception {
         final Model viewDefinition = Model.persistent.parse(Strings.toString(SearchResourceTest.class.getResourceAsStream("testViewDefinition.json")));
         final Definition recordDefinition = definition("items", keyword("fielda").metadata(Keywords.unique, true), keyword("fieldb"), keyword("fieldc"), keyword("fieldd"));
         final Record record = record(keyword("fielda"), "a", keyword("fieldb"), "b", keyword("fieldc"), "c", keyword("fieldd"), "d");

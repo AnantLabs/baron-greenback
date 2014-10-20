@@ -5,7 +5,6 @@
     <statusCode>Created</statusCode>
     <firstName>Olya</firstName>
     <createdDate>2011-07-19T13:45:58</createdDate>
-    <pony href="http://localhost:9001/entry1pony.xml" />
   </summary>
-  <sourceSystem>xxx</sourceSystem>
+  <sourceSystem>yyy</sourceSystem>
 </user>

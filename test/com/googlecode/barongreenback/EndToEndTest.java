@@ -36,7 +36,10 @@ public class EndToEndTest extends ApplicationTests {
 
         ViewSearchPage page3 = page2.nextPage();
         assertThat(page3.resultsSize(), NumberMatcher.is(1));
-        assertThat(page3.hasNextPage(), is(false));
+
+        ViewSearchPage page4 = page3.nextPage();
+        assertThat(page4.resultsSize(), NumberMatcher.is(1));
+        assertThat(page4.hasNextPage(), is(false));
     }
 
     @Test
@@ -58,9 +61,10 @@ public class EndToEndTest extends ApplicationTests {
         crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-02-19T12:43:21Z")), "newsfeed");
         ViewSearchPage viewSearchPage = view("newsfeed");
 
-        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(3));
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
 
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
+        assertThat(viewSearchPage.containsCell("title", "Baleeted user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Updated user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Created user"), is(false));
@@ -71,9 +75,10 @@ public class EndToEndTest extends ApplicationTests {
         crawlSampleData(createCrawler(null), "newsfeed");
         ViewSearchPage viewSearchPage = view("newsfeed");
 
-        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(5));
 
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
+        assertThat(viewSearchPage.containsCell("title", "Baleeted user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Updated user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Created user"), is(true));
@@ -88,9 +93,10 @@ public class EndToEndTest extends ApplicationTests {
 
         ViewSearchPage viewSearchPage = view("newsfeed");
 
-        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(5));
 
         assertThat(viewSearchPage.containsCell("event_title", "Added user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", "Baleeted user"), is(true));
         assertThat(viewSearchPage.containsCell("event_title", "Deleted user"), is(true));
         assertThat(viewSearchPage.containsCell("event_title", "Updated user"), is(true));
         assertThat(viewSearchPage.containsCell("event_title", "Created user"), is(true));
@@ -114,9 +120,9 @@ public class EndToEndTest extends ApplicationTests {
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
 
         assertThat(viewSearchPage.containsCell("event_title", 0, "Added user"), is(true));
-        assertThat(viewSearchPage.containsCell("event_title", 1, "Created user"), is(true));
-        assertThat(viewSearchPage.containsCell("event_title", 2, "Deleted user"), is(true));
-        assertThat(viewSearchPage.containsCell("event_title", 3, "Updated user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", 1, "Baleeted user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", 2, "Created user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", 3, "Deleted user"), is(true));
     }
 
     @Test
@@ -125,13 +131,15 @@ public class EndToEndTest extends ApplicationTests {
         crawlSampleData(importCrawler(EndToEndTest.class.getResourceAsStream("testQueuesCrawler.json")), "test");
         ViewSearchPage viewSearchPage = view("test");
 
-        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(3));
 
         assertThat(viewSearchPage.containsCell("firstName", 0, "Matt"), is(true));
-        assertThat(viewSearchPage.containsCell("firstName", 1, "Dan"), is(true));
-        assertThat(viewSearchPage.containsCell("mane", 1, "pink"), is(true));
-        assertThat(viewSearchPage.containsCell("shiny", 1, "very"), is(true));
+        assertThat(viewSearchPage.containsCell("firstName", 1, "Olya"), is(true));
+        assertThat(viewSearchPage.containsCell("firstName", 2, "Dan"), is(true));
+        assertThat(viewSearchPage.containsCell("mane", 2, "pink"), is(true));
+        assertThat(viewSearchPage.containsCell("shiny", 2, "very"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
+        assertThat(viewSearchPage.containsCell("title", "Baleeted user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(true));
     }
 

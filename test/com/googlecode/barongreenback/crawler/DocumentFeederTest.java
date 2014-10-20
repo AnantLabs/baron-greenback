@@ -67,7 +67,7 @@ public class DocumentFeederTest extends CrawlerTests {
     public void supportsSubFeeds() throws Exception {
         Feeder<Uri> feeder = new SubFeeder(new UriFeeder(client(), "/feed/link/@href"));
         Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
-        assertThat(records.map(FIRST).filter(Predicates.notNullValue()).realise(), IterableMatcher.hasExactly("Dan", "Matt"));
+        assertThat(records.map(FIRST).filter(Predicates.notNullValue()).realise(), IterableMatcher.hasExactly("Dan", "Matt", "Olya"));
     }
 
     @Test
