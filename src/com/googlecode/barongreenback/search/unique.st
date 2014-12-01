@@ -4,6 +4,7 @@
     <title>$view$ Details</title>
     <meta name="view" content="$view$"/>
     <meta name="query" content="$query$"/>
+    <meta name="drills" content=""/>
 $record.keys:{ groupName | $record.(groupName).keys:{ name |
     <meta name="record.$name$" content='$record.(groupName).(name); format="raw,html"$'/>
 }$}$

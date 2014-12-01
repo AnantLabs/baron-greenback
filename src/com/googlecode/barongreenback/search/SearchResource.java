@@ -211,7 +211,7 @@ public class SearchResource {
         final List<String> viewGroupNames = sequence(viewFields).map(value("group", String.class)).unique().toList();
         final Map<String, Map<String, Object>> groupedAliasedFields = record.map(withAliasesFor(headers(recordsService.view(viewName)))).get().fields().fold(newSortedMapUsing(viewGroupNames), groupBy(ViewsRepository.GROUP, aliasedViewFieldNames));
 
-        return baseModel(viewName, query, Either.<String, DrillDowns>left("")).add("record", groupedAliasedFields);
+        return baseModel(viewName, query, Either.<String, DrillDowns>right(DrillDowns.empty())).add("record", groupedAliasedFields);
     }
 
     private Mapper<Model, String> toAliasOrElseName() {
