@@ -66,6 +66,7 @@ public class WebApplication extends RestApplication {
                 queryParamRule("decorator"),
                 metaTagRule("decorator"),
                 staticRule(contentType(TEXT_HTML).and(pathContains("search/list")), templateName("search-decorator")),
+                staticRule(contentType(TEXT_HTML).and(pathContains("search/unique")), templateName("unique-decorator")),
                 staticRule(contentType(TEXT_HTML), templateName("decorator"))));
         add(new ProfilingModule());
         // must come after sitemesh

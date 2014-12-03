@@ -10,13 +10,23 @@ $record.keys:{ groupName | $record.(groupName).keys:{ name |
 }$}$
 
 </head>
-<body class="$view$ unique">
-    $record.keys:{ groupName |
-        $group(name=groupName, content={
-            $record.(groupName).keys:{ name |
-                $nameValue(name=name, value=record.(groupName).(name))$
-            }$
-        })$
-    }$
+<body>
+    <div id="quicklinks">
+        <h4 class="title">Sections</h4>
+        <ul class="nav nav-quicklinks">
+        </ul>
+    </div>
+    <div id="uniquedata">
+        <div class="$view$ unique">
+        $record.keys:{ groupName |
+            $group(name=groupName, content={
+                $record.(groupName).keys:{ name |
+                    $nameValue(name=name, value=record.(groupName).(name))$
+                }$
+            })$
+        }$
+        </div>
+    </div>
+
 </body>
 </html>

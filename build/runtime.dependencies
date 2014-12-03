@@ -6,7 +6,7 @@ mvn:com.h2database:h2:jar:1.3.160
 
 mvn:cglib:cglib-nodep:jar:2.2
 mvn:org.objenesis:objenesis:jar:1.2
-mvn:org.sitemesh:sitemesh:jar:3.0-alpha-2
+mvn:org.sitemesh:sitemesh:jar|sources:3.0.0
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
