@@ -80,29 +80,7 @@ BGB.namespace('tables').init = (function () {
         $.fn.dataTableExt.oStdClasses['sSortDesc'] = 'headerSortUp';
     };
 
-    var updateFixedHeaderPosition = function () {
-        var navbarHeight = $('.navbar').height();
 
-        var scrolled = $(window).scrollTop();
-        var resultsTop = $('div.dataTables_wrapper').offset().top;
-        var offsetAfterScroll = (resultsTop - scrolled);
-
-        var newTop = $('div.dataTables_wrapper').position().top;
-        if (offsetAfterScroll < navbarHeight) {
-            newTop += navbarHeight - offsetAfterScroll;
-        }
-
-        $('div.fixedHeader').css({
-            'position': 'absolute',
-            'top': newTop + 'px',
-            'left': 'auto'
-        });
-
-        var lastRow = $('.dataTables_wrapper').find('tr').last();
-        if ((lastRow.offset().top - $(window).scrollTop()) > navbarHeight) {
-            $('div.fixedHeader').slideDown('fast');
-        }
-    };
 
     var registerAfterDrawCallback = function (table, funct) {
         var settings = table.fnSettings();
@@ -112,12 +90,8 @@ BGB.namespace('tables').init = (function () {
         });
     };
 
-    var interestedTables = function() {
-        return $('table.results:not(.static)');
-    };
-
     var initFixedHeader = function () {
-        if (interestedTables().length == 0) {
+        if (BGB.tables.interestedTables().length == 0) {
             return;
         }
 
@@ -125,8 +99,8 @@ BGB.namespace('tables').init = (function () {
             return [$(elem).index(), $(elem).hasClass('headerSortUp') ? 'desc' : 'asc'];
         });
 
-        var clientSideSort = interestedTables().filter('.paged').length == 0;
-        var resultsTable = interestedTables().dataTable({
+        var clientSideSort = BGB.tables.interestedTables().filter('.paged').length == 0;
+        var resultsTable = BGB.tables.interestedTables().dataTable({
             'bPaginate': false,
             'bFilter': false,
             'bSort': clientSideSort,
@@ -136,18 +110,18 @@ BGB.namespace('tables').init = (function () {
             'bSortClasses': false
         });
 
-        interestedTables().filter(':not(.paged)').find('th a').click(function (event) {
+        BGB.tables.interestedTables().filter(':not(.paged)').find('th a').click(function (event) {
             event.stopPropagation();
         });
 
         new FixedHeader(resultsTable, { offsetTop: $('.navbar').height()});
 
         /* This has to be done here because the FixedHeader plugin introduces some logic to reposition the header that we want to override. */
-        registerAfterDrawCallback(resultsTable, updateFixedHeaderPosition);
+        registerAfterDrawCallback(resultsTable, BGB.tables.updateFixedHeaderPosition());
 
 
         $('div.dataTables_wrapper').css('position', '');
-        var startingTop = interestedTables().position().top;
+        var startingTop = BGB.tables.interestedTables().position().top;
 
         $('div.fixedHeader').css({
             'position': 'absolute',
@@ -157,7 +131,7 @@ BGB.namespace('tables').init = (function () {
 
         $('div.dataTables_wrapper').after($('div.fixedHeader').detach());
 
-        updateFixedHeaderPosition();
+        BGB.tables.updateFixedHeaderPosition();
     };
 
     var registerWindowEvents = function () {
@@ -175,36 +149,10 @@ BGB.namespace('tables').init = (function () {
             lastVerticalScroll = verticalScrollAmount;
             $('div.fixedHeader').hide();
             clearTimeout($.data(this, 'scrollTimer'));
-            $.data(this, 'scrollTimer', setTimeout(updateFixedHeaderPosition, 500));
+            $.data(this, 'scrollTimer', setTimeout(BGB.tables.updateFixedHeaderPosition(), 500));
         });
 
-        var resizeHandler = function() {
-            if ($("div.fixedHeader").length == 0) {
-                return;
-            }
-
-            var tableWidth = interestedTables().outerWidth();
-
-            $("div.fixedHeader").width(tableWidth);
-            $("div.fixedHeader > table").width(tableWidth);
-
-            var columnsWidths = [];
-            $('.dataTables_wrapper th').each(function () {
-                columnsWidths.push($(this).width());
-            });
-
-            var fixedHeaderCells = $('div.fixedHeader th')
-            for (var count = 0; count < columnsWidths.length; count++) {
-                $(fixedHeaderCells[count]).css('width', columnsWidths[count] + 'px');
-            }
-            updateFixedHeaderPosition();
-        };
-
-        $(window).resize(function () {
-            $('div.fixedHeader').hide();
-            clearTimeout($.data(this, 'resizeTimer'));
-            $.data(this, 'resizeTimer', setTimeout(resizeHandler, 500));
-        });
+        $(window).resize(BGB.tables.redrawFixedHeader);
     };
 
     return function () {
@@ -213,5 +161,69 @@ BGB.namespace('tables').init = (function () {
         registerWindowEvents();
     };
 })();
+
+BGB.namespace('tables').hideFixedHeader = function () {
+    $('div.fixedHeader').hide();
+};
+
+BGB.namespace('tables').redrawFixedHeader = function () {
+
+    function resizeHandler() {
+        var fixedHeader = $("div.fixedHeader");
+        if (fixedHeader.length == 0) {
+            return;
+        }
+
+        var tableWidth = BGB.tables.interestedTables().outerWidth();
+
+        fixedHeader.width(tableWidth);
+        $("div.fixedHeader > table").width(tableWidth);
+
+        var columnsWidths = [];
+        $('.dataTables_wrapper th').each(function () {
+            columnsWidths.push($(this).width());
+        });
+
+        var fixedHeaderCells = $('div.fixedHeader th')
+        for (var count = 0; count < columnsWidths.length; count++) {
+            $(fixedHeaderCells[count]).css('width', columnsWidths[count] + 'px');
+        }
+        BGB.tables.updateFixedHeaderPosition();
+    }
+
+    BGB.tables.hideFixedHeader();
+    clearTimeout($.data(this, 'resizeTimer'));
+    $.data(this, 'resizeTimer', setTimeout(resizeHandler, 500));
+};
+
+BGB.namespace('tables').updateFixedHeaderPosition = function () {
+    var navbarHeight = $('.navbar').height();
+    var dataTablesWrapper = $('div.dataTables_wrapper');
+
+    var scrolled = $(window).scrollTop();
+    var resultsTop = dataTablesWrapper.offset().top;
+    var offsetAfterScroll = (resultsTop - scrolled);
+
+    var newTop = dataTablesWrapper.position().top;
+    if (offsetAfterScroll < navbarHeight) {
+        newTop += navbarHeight - offsetAfterScroll;
+    }
+
+    var fixedHeader = $('div.fixedHeader');
+    fixedHeader.css({
+        'position': 'absolute',
+        'top': newTop + 'px',
+        'left': 'auto'
+    });
+
+    var lastRow = dataTablesWrapper.find('tr').last();
+    if ((lastRow.offset().top - $(window).scrollTop()) > navbarHeight) {
+        fixedHeader.slideDown('fast');
+    }
+};
+
+BGB.namespace('tables').interestedTables = function() {
+    return $('table.results:not(.static)');
+};
 
 $(document).ready(BGB.tables.init);

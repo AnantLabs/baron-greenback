@@ -161,6 +161,7 @@ div.container, .container {
 
 .content {
     padding: 10px;
+  padding-left: 0px;
 }
 
 .shadow(#D3D3D3); // Dan: Fixes wierd bug in less.js where it can't find .border-radius in next section
@@ -645,7 +646,11 @@ ul.facet {
 }
 
 .views-menu {
-  width: 235px;
+  width: 211px;
+  vertical-align: top;
+}
+
+.side-menu {
   border-right: 1px solid #dddddd;
   border-bottom: 1px solid #dddddd;
   vertical-align: top;
@@ -653,6 +658,7 @@ ul.facet {
   -moz-border-bottom-right-radius: 4px;
   -webkit-border-bottom-right-radius: 4px;
   float: left;
+  display: table;
 }
 
 #search-results, .results-data {
@@ -722,4 +728,26 @@ body.unique {
       background-color: white;
     }
   }
+}
+
+.side-menu-toggle-close {
+  background: url(arrow-73-24.png) #e7e7e7;
+  background-repeat: no-repeat;
+  width: 24px;
+  display:table-cell;
+  cursor:pointer;
+}
+
+
+.side-menu-toggle-open {
+  background: url(arrow-48-24.png) #e7e7e7;
+  background-repeat: no-repeat;
+  width: 24px;
+  display:table-cell;
+  height: 120px;
+  cursor:pointer;
+}
+
+.views-menu-container {
+  display:table-cell;
 }

@@ -1,6 +1,26 @@
 BGB.namespace('faceting').registerFacetEntriesHandlers = function() {
 
     var body = jQuery('body');
+    var mainContent = $('.side-menu').next();
+    var originalSearchResultsPadding = parseInt(mainContent.css('padding-left'));
+
+    function toggleSideMenu(mainContentSize) {
+        BGB.tables.hideFixedHeader();
+        $('.views-menu-container').first().toggle();
+        mainContent.css('padding-left', mainContentSize);
+//        $('#search-results').css('padding-left', mainContentSize);
+        BGB.tables.redrawFixedHeader();
+    }
+
+    body.on('click', '.side-menu-toggle-close', function () {
+        toggleSideMenu('40px');
+        $(this).removeClass('side-menu-toggle-close').addClass('side-menu-toggle-open');
+    });
+
+    body.on('click', '.side-menu-toggle-open', function () {
+        toggleSideMenu(originalSearchResultsPadding + 'px');
+        $(this).removeClass('side-menu-toggle-open').addClass('side-menu-toggle-close');
+    });
 
     body.on('click', 'a.facet-show-more-link', function (e) {
         rebuildFacet(e);
